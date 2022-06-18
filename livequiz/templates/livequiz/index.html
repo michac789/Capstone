@@ -8,4 +8,22 @@
 
 {% block body %}
     <h1>Hello World</h1>
+
+    <ol><li>
+        <ul>
+            {% for game in games %}
+                <li>{{ game.title }}</li>
+                <li>{{ game.description }}</li>
+                {{game.game_id}}
+                <a href="#">Play</a>
+            {% endfor %}
+
+            <br><br>
+            {% for gamesession in gamesessions %}
+                Code: <li>{{ gamesession.code }}</li>
+            {% endfor %}
+        </ul>
+    </li></ol>
+
+
 {% endblock body %}
