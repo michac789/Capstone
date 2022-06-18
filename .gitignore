@@ -1,3 +1,6 @@
 .vscode
 capstone/__pycache__
 livequiz/__pycache__
+livequiz/migrations/__pycache__
+sso/__pycache__
+sso/migrations/__pycache__
