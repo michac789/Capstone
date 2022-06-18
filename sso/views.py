@@ -6,11 +6,6 @@ from django.db import IntegrityError
 from .models import User
 
 
-# Create your views here.
-def test(request):
-    return HttpResponse("HOLA")
-
-
 def loginView(request):
     if request.method == "POST":
         user = authenticate(request,
@@ -24,9 +19,11 @@ def loginView(request):
         })
     return render(request, "sso/login.html")
 
+
 def logoutView(request):
     logout(request)
     return HttpResponseRedirect(reverse("livequiz:index"))
+
 
 def register(request):
     if request.method == "POST":

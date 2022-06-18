@@ -1,7 +1,12 @@
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+from sso.models import User
 
 # Create your views here.
+
+@login_required(login_url="sso:login")
 def index(request):
     return render(request, "livequiz/index.html")
 
