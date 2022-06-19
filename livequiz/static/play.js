@@ -5,18 +5,45 @@ document.addEventListener("DOMContentLoaded", () => {
     const code = document.getElementsByName("gamecode")[0].value
     console.log(code)
 
+    // player button functionality
+    let playzone = document.querySelector("#playzone")
+    playzone.onclick = (el) => {
+        if (el.target && el.target.matches("#option1")) {
+            console.log("o1")
+            answer(code, 1)
+        } else if (el.target && el.target.matches("#option2")) {
+            console.log("o2")
+            answer(code, 2)
+        } else if (el.target && el.target.matches("#option3")) {
+            console.log("o3")
+            answer(code, 3)
+        } else if (el.target && el.target.matches("#option4")) {
+            console.log("o4")
+            answer(code, 4)
+        }
+    }
+
+    // admin button functionality
+    document.querySelector("#start").onclick = () => {start(code)}
+    document.querySelector("#close").onclick = () => {close(code)}
+    document.querySelector("#next").onclick = () => {next(code)}
+
     window.setInterval(() => {
         let state = document.getElementsByName("status")[0].value
-        if (state === "preparation"){
+        if (state === "preparation") {
             console.log("preparation mode")
             checkstart(code)
-        } else if (state === "init"){
+        } else if (state === "init") {
             init()
-        } else {
+        } else if (state === "play") {
             console.log("play mode")
             fetchquestion(code)
+        } else if (state === "closed") {
+            console.log("closed")
+            closequestion(code)
+        } else {
+            console.log("answered")
         }
-
     }, 1000)
 })
 
@@ -77,14 +104,62 @@ function fetchquestion(code) {
     .then(response => response.json())
     .then(result => {
         console.log(result)
-        let { current_question, question_no } = result
-        console.log(current_question)
-        console.log(question_no)
+        let { current_question, question_no, open } = result
         document.getElementById("question").innerHTML = current_question.question
         document.getElementById("option1").innerHTML = current_question.choice1
         document.getElementById("option2").innerHTML = current_question.choice2
         document.getElementById("option3").innerHTML = current_question.choice3
         document.getElementById("option4").innerHTML = current_question.choice4
+        if (open === false) {
+            document.getElementsByName("status")[0].value = "closed"
+        }
+    })
+}
+
+function start(code) {
+    fetch(`/api/action/${code}`, { method: "START",})
+    .then(response => response.json())
+    .then(result => { console.log(result) })
+}
+
+function close(code) {
+    fetch(`/api/action/${code}`, { method: "CLOSE",})
+    .then(response => response.json())
+    .then(result => { console.log(result) })
+}
+
+function next(code) {
+    fetch(`/api/action/${code}`, { method: "NEXT",})
+    .then(response => response.json())
+    .then(result => { console.log(result) })
+}
+
+function closequestion(code) {
+    console.log("question closed")
+    fetch(`/api/retrieve/${code}`, {
+        method: "VIEW",
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+        document.getElementById("playzone").innerHTML = `<h2>Closed</h2>`
+        let { current_question, question_no, open } = result
+        if (open === true) {
+            document.getElementsByName("status")[0].value = "init"
+        }
+    })
+}
+
+function answer(code, ans) {
+    console.log("submitting ans...")
+    fetch(`/api/retrieve/${code}`, {
+        method: "POST",
+        body: JSON.stringify({ answer: ans,})
+    })
+    .then(response => response.json())
+    .then(result => {
+        console.log(result)
+        document.getElementsByName("status")[0].value = "answered"
     })
 }
 

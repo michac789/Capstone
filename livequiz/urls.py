@@ -9,6 +9,7 @@ urlpatterns = [
     path("play/entercode", views.enterGame, name="entercode"),
     path("play/<str:game_code>", views.playGame, name="play"),
     
-    # API route
+    # API routes
     path("api/retrieve/<str:game_code>", views.retrieveGame),
+    path("api/action/<str:game_code>", views.gameAction),
 ]

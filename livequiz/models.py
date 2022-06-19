@@ -18,9 +18,10 @@ class GameSession(models.Model):
     id = models.BigAutoField(primary_key=True)
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name="hosted_games")
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="ongoing", null=True)
-    active = models.BooleanField(default=False)
     code = models.CharField(max_length=6, primary_key=False, editable=False, unique=True)
+    active = models.BooleanField(default=False)
     current_question = models.IntegerField(default=1)
+    stillopen = models.BooleanField(default=True)
     
     def save(self, *args, **kwargs):
         if not self.code: self.code = get_random_string(6)
@@ -30,7 +31,32 @@ class GameSession(models.Model):
         return {
             "active": self.active,
             "current_question": self.current_question,
+            "stillopen": self.stillopen,
         }
+    
+    def activate(self, *args, **kwargs):
+        self.current_question = 1
+        self.active = True
+        return super(GameSession, self).save(*args, **kwargs)
+        
+    def deactivate(self, *args, **kwargs):
+        self.active = False
+        return super(GameSession, self).save(*args, **kwargs)
+        
+    def nextquestion(self, *args, **kwargs):
+        self.current_question = self.current_question + 1
+        self.stillopen = True
+        return super(GameSession, self).save(*args, **kwargs)
+        
+    def closequestion(self, *args, **kwargs):
+        self.stillopen = False
+        return super(GameSession, self).save(*args, **kwargs)
+    
+    # def reset(self, *args, **kwargs):
+    #     self.active = True
+    #     self.current_question = 1
+    #     self.stillopen = True
+    #     return super(GameSession, self).save(*args, **kwargs)
 
 
 class QuestionTemplate(models.Model):
@@ -71,5 +97,8 @@ class AnswerPairType1(models.Model):
     answer = models.CharField(max_length=1, choices=CHOICES)
     question = models.ForeignKey(QuestionType1, on_delete=models.CASCADE)
     gamesession = models.ForeignKey(GameSession, on_delete=models.CASCADE)
+
+
+
 
 
