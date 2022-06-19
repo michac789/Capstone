@@ -31,15 +31,17 @@ def playGame(request, game_code):
     
     
     return render(request, "livequiz/play.html", {
-        "game": "aaa"
+        "game": game,
+        "active": gamesession.active,
+        "gamesession": gamesession,
     })
 
 """ action:
 activate --> put
 deactivate --> delete
 retrieve --> get
+checkstarted --> view
 """
-
 @csrf_exempt
 def retrieveGame(request, game_code):
     print("RETRIEVE GAME API ROUTE")
@@ -48,7 +50,7 @@ def retrieveGame(request, game_code):
         return JsonResponse({"party": "HAHAHA"})
     
     gamesession = GameSession.objects.get(code=game_code)
-    if request.method == "GET":
+    if request.method == "VIEW":
         print(gamesession)
         
         x = gamesession.game.get_questiontype1_order()
@@ -68,6 +70,10 @@ def retrieveGame(request, game_code):
         return JsonResponse({
             "current_question": question.serialize(),
             "question_no": curr_ques_no,
+        })
+    elif request.method == "GET":
+        return JsonResponse({
+            "started": gamesession.active,
         })
 
 

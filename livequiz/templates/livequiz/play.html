@@ -1,14 +1,17 @@
 {% extends 'layout/root.html' %}
+{% load static %}
 
 {% block title %}
     Game {{ game.game_id }}
 {% endblock title %}
 
 {% block script %}
+    <script src="{% static "play.js" %}"></script>
+
     <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-
+        
 {% endblock script %}
 
 {% block body %}
@@ -20,6 +23,14 @@
     description: {{ game.description }}<br>
     time_created: {{ game.time_created }}<br>
 
+    Code:
+    <div id="gamecode">
+        {{ gamesession.code }}
+    </div>
+
+    <input type="hidden" name="gamecode" value={{ gamesession.code }}>
+    <input type="hidden" name="status" value="preparation">
+
 
     {% for question in game.questions.all %}
         <ul>
@@ -30,8 +41,20 @@
             <li>{{ question.choice4 }}</li>
         </ul>
     {% endfor %}
-    
 
+
+    PLAY SECTION HERE
+    <section id="playzone">
+        Not Started
+        {% comment %} {% if active %}
+            started
+        {% else %}
+            not started
+        {% endif %} {% endcomment %}
+    </section>
+    
+    
+    <br><br><br><br>
     {% include "react/play.html" %}
 
 {% endblock body %}
