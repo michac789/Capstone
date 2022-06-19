@@ -28,6 +28,8 @@
         {{ gamesession.code }}
     </div>{% endcomment %}
 
+    <a href="{% url 'livequiz:index' %}">Back Home</a>
+
     <input type="hidden" name="gamecode" value={{ gamesession.code }}>
     <input type="hidden" name="status" value="preparation">
 

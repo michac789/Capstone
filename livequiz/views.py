@@ -1,5 +1,6 @@
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
@@ -7,6 +8,7 @@ from json import loads
 
 from .models import Game, GameSession, QuestionType1, AnswerPairType1
 from sso.models import User
+from .forms import GameForm
 
 
 @login_required(login_url="sso:login")
@@ -16,10 +18,24 @@ def index(request):
         "gamesessions": GameSession.objects.all(),
     })
 
-def createGame(request):
-    return render(request, "livequiz/create.html")
 
-def editGame(request, game_code):
+def createGame(request):
+    if request.method == "POST":
+        form = GameForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data["title"]
+            description = form.cleaned_data["description"]
+            newgame = Game(creator = request.user, title = title, description = description)
+            newgame.save()
+            return HttpResponseRedirect(reverse("livequiz:edit", kwargs = {
+                "game_id": newgame.id,
+            }))
+        else:
+            return render(request, "livequiz/create.html", { "form": form,})
+    return render(request, "livequiz/create.html", { "form": GameForm,})
+
+
+def editGame(request, game_id):
     return render(request, "livequiz/edit.html")
 
 def enterGame(request):
