@@ -1,0 +1,63 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    Game {{ game.game_id }}
+{% endblock title %}
+
+{% block script %}
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <script src="{% static "play.js" %}"></script>
+    <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+        
+{% endblock script %}
+
+{% block body %}
+    {% comment %} <h1>PLAY PAGE - TODO</h1>
+    id: {{ game.id }}<br>
+    game_id: {{ game.game_id }}<br>
+    creator: {{ game.creator.username }}<br>
+    title: {{ game.title }}<br>
+    description: {{ game.description }}<br>
+    time_created: {{ game.time_created }}<br>
+
+    Code:
+    <div id="gamecode">
+        {{ gamesession.code }}
+    </div>{% endcomment %}
+
+    <a href="{% url 'livequiz:index' %}">Back Home</a>
+
+    <input type="hidden" name="gamecode" value={{ gamesession.code }}>
+    <input type="hidden" name="status" value="preparation">
+
+
+    {% comment %} {% for question in game.questions.all %}
+        <ul>
+            {{ question.question }}
+            <li>{{ question.choice1 }}</li>
+            <li>{{ question.choice2 }}</li>
+            <li>{{ question.choice3 }}</li>
+            <li>{{ question.choice4 }}</li>
+        </ul>
+    {% endfor %}  {% endcomment %}
+
+    Play zone
+    <section id="playzone">
+        Not Started
+        {% comment %} {% if active %}
+            started
+        {% else %}
+            not started
+        {% endif %} {% endcomment %}
+    </section>
+
+    <section id="admincontrol">
+        <button id="start">Start</button>
+        <button id="close">Close</button>
+        <button id="next">Next</button>
+    </section>
+
+{% endblock body %}

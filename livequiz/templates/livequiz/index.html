@@ -1,0 +1,47 @@
+{% extends 'layout/root.html' %}
+
+{% block title %}
+    Dashboard
+{% endblock title %}
+
+{% block script %}{% endblock script %}
+
+{% block body %}
+    <h1>Dashboard TODO</h1>
+
+    <a href="{% url 'livequiz:entercode' %}">Enter Code</a><br>
+    <a href="{% url 'livequiz:create' %}">Create Game</a><br>
+    
+    <h3>All games</h3>
+    <ol>
+        {% for game in games %}
+            <li><ul>
+                <li>Game ID: {{ game.id }}</li>
+                <li>Creator: {{ game.creator.username }}</li>
+                <li>Title: {{ game.title }}</li>
+                <li>Description: {{ game.description }}</li>
+                <li>Date created: {{ game.time_created }}</li>
+                <a href="#">Play - TODO</a>
+                <a href="{% url 'livequiz:edit' game_id=game.id %}">
+                    Edit Game (for creator only)
+                </a>
+            </ul></li><br>
+        {% endfor %}
+    </ol>
+
+    <h3>All active game sessions:</h3>
+    <ol>
+        {% for gamesession in gamesessions %}
+            <li><ul>
+                <li>Game: {{ gamesession.game.title }}</li>
+                <li>Code: {{ gamesession.code }}</li>
+                <li>Host: {{ gamesession.host }}</li>
+                <li><a href="{% url 'livequiz:play' game_code=gamesession.code %}">
+                    Play
+                </a></li>
+            </ul></li>
+        {% endfor %}
+    </ol>
+    
+    
+{% endblock body %}

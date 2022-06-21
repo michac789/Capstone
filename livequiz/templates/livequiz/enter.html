@@ -1,0 +1,21 @@
+{% extends 'layout/root.html' %}
+
+{% block title %}
+    Enter Code
+{% endblock title %}
+
+{% block script %}{% endblock script %}
+
+{% block body %}
+    <h1>ENTER CODE PAGE TODO</h1>
+
+    <a href="{% url 'livequiz:index' %}">back to home</a>
+    
+    <form action={% url 'livequiz:entercode' %} method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit" value="Play">
+    </form>
+    {{ error }}
+
+{% endblock body %}

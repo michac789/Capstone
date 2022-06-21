@@ -1,0 +1,21 @@
+{% extends 'layout/root.html' %}
+
+{% block title %}
+    Create Game
+{% endblock title %}
+
+{% block script %}{% endblock script %}
+
+{% block body %}
+    <h1>CREATE PAGE TODO</h1>
+
+    <a href="{% url 'livequiz:index' %}">back to home</a>
+
+    <form action="{% url 'livequiz:create' %}" method="POST">
+        {% csrf_token %}
+        {{ form }}
+        <input type="submit"></input>
+    </form>
+    
+
+{% endblock body %}

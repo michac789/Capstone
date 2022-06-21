@@ -1,0 +1,41 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    Edit Game {{ game.id }}
+{% endblock title %}
+
+{% block script %}
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="{% static "edit.js" %}" type="module"></script>
+{% endblock script %}
+
+{% block body %}
+    <h1>EDIT PAGE TODO</h1>
+
+    <a href="{% url 'livequiz:index' %}">back to home</a>
+
+
+    {% for question in questions.all %}
+        <div class="questiondiv" data-quesid={{ question.id }}>
+            <h3>Q{{ forloop.counter }}.</h3>
+            <section class="questioneditable">
+                Question: <span class="ques">{{ question.question }}</span><br>
+                Option 1: <span class="opt1">{{ question.choice1 }}</span><br>
+                Option 2: <span class="opt2">{{ question.choice2 }}</span><br>
+                Option 3: <span class="opt3">{{ question.choice3 }}</span><br>
+                Option 4: <span class="opt4">{{ question.choice4 }}</span><br>
+                <div class="ans">Ans: {{ question.answer }}</div>
+                <button class="editbutton" data-quesid={{ question.id }}>
+                    Edit
+                </button>
+            </section>
+        </div>
+    {% empty %}
+        No questions created yet!
+    {% endfor %}
+
+    
+
+{% endblock body %}
