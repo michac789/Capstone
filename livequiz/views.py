@@ -8,7 +8,7 @@ from json import loads
 
 from .models import Game, GameSession, QuestionType1, AnswerPairType1
 from sso.models import User
-from .forms import GameForm
+from .forms import GameForm, CodeForm, QuestionForm
 
 
 @login_required(login_url="sso:login")
@@ -19,6 +19,7 @@ def index(request):
     })
 
 
+@login_required(login_url="sso:login")
 def createGame(request):
     if request.method == "POST":
         form = GameForm(request.POST)
@@ -35,11 +36,31 @@ def createGame(request):
     return render(request, "livequiz/create.html", { "form": GameForm,})
 
 
-def editGame(request, game_id):
-    return render(request, "livequiz/edit.html")
+@login_required(login_url="sso:login")
+def editGame(request, game_id): # TODO - buggy
+    game = Game.objects.get(id = game_id)
+    return render(request, "livequiz/edit.html", {
+        "game": game,
+        "questions": game.questions,
+    })
 
+
+@login_required(login_url="sso:login")
 def enterGame(request):
-    return render(request, "livequiz/enter.html")
+    if request.method == "POST":
+        form = CodeForm(request.POST)
+        valid_codes = GameSession.objects.all().values_list('code', flat = True)
+        if form.is_valid() and form.cleaned_data["sessioncode"] in valid_codes:
+            return HttpResponseRedirect(reverse("livequiz:play", kwargs = {
+                "game_code": form.cleaned_data["sessioncode"],
+            }))
+        else:
+            return render(request, "livequiz/enter.html", {
+                "form": form,
+                "error": "invalid code!"
+            })
+    return render(request, "livequiz/enter.html", { "form": CodeForm,})
+
 
 def playGame(request, game_code):
     gamesession = GameSession.objects.get(code=game_code)
