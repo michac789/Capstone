@@ -8,7 +8,7 @@ class Game(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games")
     title = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256)
-    time_created = models.DateField(auto_now=True)
+    date_created = models.DateField(auto_now=True)
     
     def __str__(self):
         return f"<Game {self.id}: {self.title}>"
@@ -22,6 +22,11 @@ class GameSession(models.Model):
     active = models.BooleanField(default=False)
     current_question = models.IntegerField(default=0)
     stillopen = models.BooleanField(default=True)
+    
+    class Meta: verbose_name = "Game Session"
+    
+    def __str__(self):
+        return f"<Gamesession {self.id}, hosted by {self.host}, game id {self.game.id}>"
     
     def save(self, *args, **kwargs):
         if not self.code: self.code = get_random_string(6)
@@ -76,6 +81,15 @@ class QuestionType1(QuestionTemplate):
     CHOICES = [("1", choice1), ("2", choice2), ("3", choice3), ("4", choice4)]
     answer = models.CharField(max_length=1, choices=CHOICES, default="1")
     
+    class Meta: verbose_name = "Type 1 Question"
+    
+    def __eq__(self, other):
+        if (self.choice1 == other.choice1 and self.choice2 == other.choice2 and
+            self.choice3 == other.choice3 and self.choice3 == other.choice3 and
+            self.question == other.question and self.answer == other.answer):
+                return True
+        else: return False
+    
     def serialize(self):
         return {
             "question": self.question,
@@ -98,10 +112,17 @@ class QuestionType1(QuestionTemplate):
         return self.answer #TODO
 
 
+class UserSession(models.Model):
+    player = models.ForeignKey(User, on_delete=models.CASCADE)
+    gamesession = models.ForeignKey(GameSession, on_delete=models.CASCADE)
+    time_joined = models.DateTimeField(auto_now=True)
+    score = models.IntegerField(default=0)
+    
+
 class AnswerPairType1(models.Model):
     CHOICES = [("0", "unanswered"), ("1", "c1"), ("2", "c2"), ("3", "c3"), ("4", "c4")]
-    player = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = models.CharField(max_length=1, choices=CHOICES)
     question = models.ForeignKey(QuestionType1, on_delete=models.CASCADE)
-    gamesession = models.ForeignKey(GameSession, on_delete=models.CASCADE)
-
+    usersession = models.ForeignKey(UserSession, on_delete=models.CASCADE, related_name="answers")
+    
+    class Meta: verbose_name = "Type 1 Answer Pair"

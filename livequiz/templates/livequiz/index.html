@@ -24,7 +24,7 @@
                 <li>Creator: {{ game.creator.username }}</li>
                 <li>Title: {{ game.title }}</li>
                 <li>Description: {{ game.description }}</li>
-                <li>Date created: {{ game.time_created }}</li>
+                <li>Date created: {{ game.date_created }}</li>
                 <a href="#">Play - TODO</a>
                 <a href="{% url 'livequiz:edit' game_id=game.id %}">
                     Edit Game (for creator only)
