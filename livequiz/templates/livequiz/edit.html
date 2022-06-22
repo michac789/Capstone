@@ -37,10 +37,17 @@
                     Edit
                 </button>
             </section>
+            <button class="deletebutton" value={{ question.id }}>Delete</button>
         </div>
     {% empty %}
         No questions created yet!
-    {% endfor %}
-
+    {% endfor %}<br>
+    
+    <form action="{% url 'livequiz:edit' game_id=game.id %}" method="POST">
+        {% csrf_token %}
+        {{ form.ques_count.label_tag }}
+        {{ form.ques_count }}
+        <button type="submit">Add</button>
+    </form>
     
 {% endblock body %}

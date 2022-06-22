@@ -11,6 +11,11 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     )
+    document.querySelectorAll(".deletebutton").forEach(
+        el => el.onclick = (e) => {
+            deletequestion(e.target.value)
+        }
+    )
 })
 
 function form_input(id, opt, lab) {
@@ -77,7 +82,6 @@ function save(id) {
         }
     ).then(response => response.json()
     ).then(res => {
-        console.log(res)
         document.querySelector(`.questiondiv[data-quesid='${id}']>.questioneditable`).innerHTML =
         creappend("div", {}, [
             create("span", { "class": "ques_text",}, "Question: "),
@@ -94,5 +98,16 @@ function save(id) {
             create("span", { "class": "ans",}, res.q.ans), create("br", {}),
             create("button", { "class": "editbutton", "data-quesid": id,}, "Edit"),
         ]).innerHTML
+    }).catch(error => console.log(error))
+}
+
+function deletequestion(id) {
+    fetchURL(`/api/savequestion/${id}`, {
+        method: "DELETE",
+        body: JSON.stringify({}),
+        headers: { "X-CSRFToken": getCookie('csrftoken'),},
+    }).then(response => response.json()
+    ).then(_ => {
+        window.location.reload()
     }).catch(error => console.log(error))
 }

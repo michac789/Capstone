@@ -8,7 +8,7 @@ from json import loads
 
 from .models import Game, GameSession, QuestionType1, AnswerPairType1
 from sso.models import User
-from .forms import GameForm, CodeForm, QuestionForm
+from .forms import GameForm, CodeForm, AddQuesForm
 
 
 @login_required(login_url="sso:login")
@@ -37,12 +37,28 @@ def createGame(request):
 
 
 @login_required(login_url="sso:login")
-def editGame(request, game_id): # TODO - buggy
+def editGame(request, game_id):
     game = Game.objects.get(id = game_id)
-    return render(request, "livequiz/edit.html", {
-        "game": game,
-        "questions": game.questions,
-    })
+    if request.method == "POST":
+        form = AddQuesForm(request.POST)
+        if form.is_valid():
+            ques_count = form.cleaned_data["ques_count"]
+            print(type(ques_count))
+            for _ in range(int(ques_count)):
+                QuestionType1(game_origin = game, answer = 1).save()
+            return HttpResponseRedirect(reverse("livequiz:edit", args = (game_id,)))
+        else:
+            return render(request, "livequiz/edit.html", {
+                "game": game,
+                "questions": game.questions,
+                "form": form,
+            })
+    else:
+        return render(request, "livequiz/edit.html", {
+            "game": game,
+            "questions": game.questions,
+            "form": AddQuesForm,
+        })
 
 
 @login_required(login_url="sso:login")
@@ -184,18 +200,7 @@ def gameAction(request, game_code):
 
 
 def saveQuestion(request, ques_id):
-    print("SAVE GAME API ROUTE")
-    
-    # check if correct answer is valid (can only be 1-4)
-    data = loads(request.body)
-    if data["ans"] not in [1, 2, 3, 4]:
-        return JsonResponse({
-            "error": "invalid answer option"
-        }, status = 400)
-        
-    # 'POST' method: create new question and associate with current game
-    if request.method == "POST":
-        pass # TODO
+    print("SAVE EDITED QUESTION API ROUTE")
 
     # check if question id is valid
     try: q = QuestionType1.objects.get(id=ques_id)
@@ -209,6 +214,21 @@ def saveQuestion(request, ques_id):
         return JsonResponse({
             "error": "unauthorized user"
         }, status = 401)
+        
+    # 'DELETE' method: delete a particular question
+    if request.method == "DELETE":
+        game = q.game_origin
+        q.delete()
+        return JsonResponse({
+            "success": "question deleted",
+        })
+    
+    # check if correct answer input is valid (can only be 1-4)
+    data = loads(request.body)
+    if data["ans"] not in [1, 2, 3, 4]:
+        return JsonResponse({
+            "error": "invalid answer option"
+        }, status = 400)
     
     # 'PUT' method: update existing question with new values
     if request.method == "PUT":
@@ -221,8 +241,6 @@ def saveQuestion(request, ques_id):
         
     # return error for other request method
     else: return JsonResponse({
-            "error": "invalid request method, only accepting PUT & POST method"
+            "error": "invalid request method, only accepting PUT and DELETE method"
         }, status = 404)
-
-
 

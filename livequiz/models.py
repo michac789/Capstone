@@ -51,12 +51,6 @@ class GameSession(models.Model):
     def closequestion(self, *args, **kwargs):
         self.stillopen = False
         return super(GameSession, self).save(*args, **kwargs)
-    
-    # def reset(self, *args, **kwargs):
-    #     self.active = True
-    #     self.current_question = 1
-    #     self.stillopen = True
-    #     return super(GameSession, self).save(*args, **kwargs)
 
 
 class QuestionTemplate(models.Model):
