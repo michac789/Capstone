@@ -13,4 +13,5 @@ urlpatterns = [
     # API routes
     path("api/retrieve/<str:game_code>", views.retrieveGame),
     path("api/action/<str:game_code>", views.gameAction),
+    path("api/savequestion/<str:ques_id>", views.saveQuestion),
 ]

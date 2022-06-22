@@ -86,10 +86,17 @@ class QuestionType1(QuestionTemplate):
             "choice4": self.choice4,
         }
         
+    def saveedit(self, dict, *args, **kwargs):
+        self.question = dict["ques"]
+        self.choice1 = dict["opt1"]
+        self.choice2 = dict["opt2"]
+        self.choice3 = dict["opt3"]
+        self.choice4 = dict["opt4"]
+        self.answer = dict["ans"]
+        return super(QuestionType1, self).save(*args, **kwargs)
+        
     def get_answer(self):
         return self.answer #TODO
-
-
 
 class AnswerPairType1(models.Model):
     CHOICES = [("0", "unanswered"), ("1", "c1"), ("2", "c2"), ("3", "c3"), ("4", "c4")]

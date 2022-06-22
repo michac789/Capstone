@@ -183,4 +183,46 @@ def gameAction(request, game_code):
         }, status = 400)
 
 
+def saveQuestion(request, ques_id):
+    print("SAVE GAME API ROUTE")
+    
+    # check if correct answer is valid (can only be 1-4)
+    data = loads(request.body)
+    if data["ans"] not in [1, 2, 3, 4]:
+        return JsonResponse({
+            "error": "invalid answer option"
+        }, status = 400)
+        
+    # 'POST' method: create new question and associate with current game
+    if request.method == "POST":
+        pass # TODO
+
+    # check if question id is valid
+    try: q = QuestionType1.objects.get(id=ques_id)
+    except QuestionType1.DoesNotExist:
+        return JsonResponse({
+            "error": "invalid question id"
+        }, status = 400)
+        
+    # check if user is valid (must be the creator of the game)
+    if request.user != q.game_origin.creator:
+        return JsonResponse({
+            "error": "unauthorized user"
+        }, status = 401)
+    
+    # 'PUT' method: update existing question with new values
+    if request.method == "PUT":
+        q.saveedit({"ques":data["ques"], "opt1":data["opt1"], "opt2":data["opt2"],
+                   "opt3":data["opt3"], "opt4":data["opt4"], "ans":data["ans"],})
+        return JsonResponse({
+            "success": "edit succesful",
+            "q": data,
+        })
+        
+    # return error for other request method
+    else: return JsonResponse({
+            "error": "invalid request method, only accepting PUT & POST method"
+        }, status = 404)
+
+
 

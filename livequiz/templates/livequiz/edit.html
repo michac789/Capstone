@@ -21,12 +21,18 @@
         <div class="questiondiv" data-quesid={{ question.id }}>
             <h3>Q{{ forloop.counter }}.</h3>
             <section class="questioneditable">
-                Question: <span class="ques">{{ question.question }}</span><br>
-                Option 1: <span class="opt1">{{ question.choice1 }}</span><br>
-                Option 2: <span class="opt2">{{ question.choice2 }}</span><br>
-                Option 3: <span class="opt3">{{ question.choice3 }}</span><br>
-                Option 4: <span class="opt4">{{ question.choice4 }}</span><br>
-                <div class="ans">Ans: {{ question.answer }}</div>
+                <span class="ques_text">Question:</span>
+                <span class="ques">{{ question.question }}</span><br>
+                <span class="opt1_text">Option 1:</span>
+                <span class="opt1">{{ question.choice1 }}</span><br>
+                <span class="opt2_text">Option 2:</span>
+                <span class="opt2">{{ question.choice2 }}</span><br>
+                <span class="opt3_text">Option 3:</span>
+                <span class="opt3">{{ question.choice3 }}</span><br>
+                <span class="opt4_text">Option 4:</span>
+                <span class="opt4">{{ question.choice4 }}</span><br>
+                <span class="ans_text">Ans: </span>
+                <span class="ans">{{ question.answer }}</span><br>
                 <button class="editbutton" data-quesid={{ question.id }}>
                     Edit
                 </button>
@@ -37,5 +43,4 @@
     {% endfor %}
 
     
-
 {% endblock body %}
