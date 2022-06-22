@@ -1,4 +1,5 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from re import S
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
@@ -13,6 +14,13 @@ from .forms import GameForm, CodeForm, AddQuesForm
 
 @login_required(login_url="sso:login")
 def index(request):
+    if request.method == "POST":
+        session_id = request.POST["session_id"]
+        try:
+            gamesession = GameSession.objects.get(id = session_id)
+        except GameSession.DoesNotExist:
+            raise Http404("Gamesession not found!")
+        gamesession.delete()
     return render(request, "livequiz/index.html", {
         "games": Game.objects.all(),
         "gamesessions": GameSession.objects.all(),
@@ -59,6 +67,22 @@ def editGame(request, game_id):
             "questions": game.questions,
             "form": AddQuesForm,
         })
+
+
+@login_required(login_url="sso:login")
+def hostGame(request):
+    if request.method == "POST": #TODO - check if integer
+        game_id = int(request.POST["game_id"])
+        if game_id not in list(Game.objects.all().values_list('id', flat = True)):
+            return render(request, "livequiz/host.html", {
+                "message": "Invalid Game ID",
+            })
+        game_session = GameSession.objects.create(host = request.user,
+                                   game = Game.objects.get(id = game_id))
+        return HttpResponseRedirect(reverse("livequiz:play", kwargs = {
+            "game_code": game_session.code
+        }))
+    return render(request, "livequiz/host.html")
 
 
 @login_required(login_url="sso:login")
@@ -119,7 +143,7 @@ def retrieveGame(request, game_code):
         # print(type(x[1]))
         
         # question = QuestionType1.objects.get(id=temp[gamesession.current_question])
-        # print(question.question)        
+        # print(question.question)
         # print(gamesession.current_question)
         # print(gamesession.serialize())
         

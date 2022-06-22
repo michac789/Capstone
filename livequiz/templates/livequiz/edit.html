@@ -2,12 +2,10 @@
 {% load static %}
 
 {% block title %}
-    Edit Game {{ game.id }}
+    Edit Game
 {% endblock title %}
 
 {% block script %}
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="{% static "edit.js" %}" type="module"></script>
 {% endblock script %}
 
@@ -15,7 +13,7 @@
     <h1>EDIT PAGE TODO</h1>
 
     <a href="{% url 'livequiz:index' %}">back to home</a>
-
+    
 
     {% for question in questions.all %}
         <div class="questiondiv" data-quesid={{ question.id }}>
@@ -33,21 +31,27 @@
                 <span class="opt4">{{ question.choice4 }}</span><br>
                 <span class="ans_text">Ans: </span>
                 <span class="ans">{{ question.answer }}</span><br>
-                <button class="editbutton" data-quesid={{ question.id }}>
-                    Edit
-                </button>
+                {% if request.user == game.creator %}
+                    <button class="editbutton" data-quesid={{ question.id }}>
+                        Edit
+                    </button>
+                {% endif %}
             </section>
-            <button class="deletebutton" value={{ question.id }}>Delete</button>
+            {% if request.user == game.creator %}
+                <button class="deletebutton" value={{ question.id }}>Delete</button>
+            {% endif %}
         </div>
     {% empty %}
         No questions created yet!
     {% endfor %}<br>
     
-    <form action="{% url 'livequiz:edit' game_id=game.id %}" method="POST">
-        {% csrf_token %}
-        {{ form.ques_count.label_tag }}
-        {{ form.ques_count }}
-        <button type="submit">Add</button>
-    </form>
+    {% if request.user == game.creator %}
+        <form action="{% url 'livequiz:edit' game_id=game.id %}" method="POST">
+            {% csrf_token %}
+            {{ form.ques_count.label_tag }}
+            {{ form.ques_count }}
+            <button type="submit">Add</button>
+        </form>
+    {% endif %}
     
 {% endblock body %}

@@ -6,12 +6,12 @@ from sso.models import User
 class Game(models.Model):
     id = models.AutoField(primary_key=True)
     creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="games")
-    title = models.CharField(max_length=64)
+    title = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=256)
     time_created = models.DateField(auto_now=True)
     
     def __str__(self):
-        return f"Game {self.id}: {self.title}"
+        return f"<Game {self.id}: {self.title}>"
 
 
 class GameSession(models.Model):
@@ -92,14 +92,11 @@ class QuestionType1(QuestionTemplate):
     def get_answer(self):
         return self.answer #TODO
 
+
 class AnswerPairType1(models.Model):
     CHOICES = [("0", "unanswered"), ("1", "c1"), ("2", "c2"), ("3", "c3"), ("4", "c4")]
     player = models.ForeignKey(User, on_delete=models.CASCADE)
     answer = models.CharField(max_length=1, choices=CHOICES)
     question = models.ForeignKey(QuestionType1, on_delete=models.CASCADE)
     gamesession = models.ForeignKey(GameSession, on_delete=models.CASCADE)
-
-
-
-
 

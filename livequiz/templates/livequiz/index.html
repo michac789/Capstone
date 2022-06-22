@@ -1,16 +1,20 @@
 {% extends 'layout/root.html' %}
+{% load static %}
 
 {% block title %}
     Dashboard
 {% endblock title %}
 
-{% block script %}{% endblock script %}
+{% block script %}
+    <script src="{% static "index.js" %}" type="module"></script>
+{% endblock script %}
 
 {% block body %}
     <h1>Dashboard TODO</h1>
 
     <a href="{% url 'livequiz:entercode' %}">Enter Code</a><br>
     <a href="{% url 'livequiz:create' %}">Create Game</a><br>
+    <a href="{% url 'livequiz:host' %}">Host Session</a>
     
     <h3>All games</h3>
     <ol>
@@ -39,9 +43,15 @@
                 <li><a href="{% url 'livequiz:play' game_code=gamesession.code %}">
                     Play
                 </a></li>
+                {% if gamesession.host == request.user %}
+                    <form action="{% url 'livequiz:index' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="session_id" value={{ gamesession.id }}>
+                        <button type="submit">Delete</button>
+                    </form>
+                {% endif %}
             </ul></li>
         {% endfor %}
     </ol>
-    
     
 {% endblock body %}

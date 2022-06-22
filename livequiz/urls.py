@@ -7,6 +7,7 @@ urlpatterns = [
     path("dashboard", views.index, name="index"),
     path("create", views.createGame, name="create"),
     path("create/<int:game_id>", views.editGame, name="edit"),
+    path("create/host", views.hostGame, name="host"),
     path("play/entercode", views.enterGame, name="entercode"),
     path("play/<str:game_code>", views.playGame, name="play"),
     
