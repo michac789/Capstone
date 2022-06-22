@@ -107,11 +107,11 @@ def playGame(request, game_code):
     game = gamesession.game
     print(game)
     
-    
     return render(request, "livequiz/play.html", {
         "game": game,
         "active": gamesession.active,
         "gamesession": gamesession,
+        "admin": request.user == gamesession.host,
     })
 
 """ action:
@@ -119,8 +119,6 @@ activate --> put
 deactivate --> delete
 retrieve --> get
 checkstarted --> view
-
-
 """
 @csrf_exempt
 def retrieveGame(request, game_code):
@@ -133,8 +131,6 @@ def retrieveGame(request, game_code):
             "error": "invalid gamesession"
         }, status = 400)
 
-    # 
-    if request.method == "VIEW":
         # temp = gamesession.game.get_questiontype1_order()
         # print(x)
         # print(x[0])
@@ -146,40 +142,38 @@ def retrieveGame(request, game_code):
         # print(question.question)
         # print(gamesession.current_question)
         # print(gamesession.serialize())
-        
+    
+    # return jsonresponse of current question and its options
+    if request.method == "VIEW":
         question_ids = gamesession.game.get_questiontype1_order()
         curr_ques_no = gamesession.current_question
         question = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
         return JsonResponse({
             "current_question": question.serialize(),
             "question_no": curr_ques_no,
-            "open": gamesession.stillopen,
         })
-        
+    
+    # return jsonresponse of current game state (started or not)
     elif request.method == "GET":
-        print(gamesession.serialize())
-        return JsonResponse({
-            "started": gamesession.active,
-        })
-        
+        return JsonResponse({ "status": gamesession.status(),})
+    
+    # if gamesession is not closed yet, register user's answer
     elif request.method == "POST":
+        if gamesession.status() == "closed" or gamesession.status() == "prep":
+            return JsonResponse({ "message": "closed",})
+        # create new answerpair & save to database
         data = loads(request.body)
         a = data["answer"]
-        
         question_ids = gamesession.game.get_questiontype1_order()
         curr_ques_no = gamesession.current_question
         q = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
-        
         ans = AnswerPairType1(player=request.user, answer=a, question=q, gamesession=gamesession)
         ans.save()
-        
+        # return successful jsonresponse
         return JsonResponse({
             "message": "submitted",
             "answer": a,
         })
-
-#x = serializers.serialize("json", gamesession)
-
 
 
 @csrf_exempt

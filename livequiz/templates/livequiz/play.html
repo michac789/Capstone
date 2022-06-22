@@ -7,11 +7,10 @@
 
 {% block script %}
     <link href="{% static 'styles.css' %}" rel="stylesheet">
-    <script src="{% static "play.js" %}"></script>
-    <script src="https://unpkg.com/react@16/umd/react.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js" crossorigin></script>
-    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
-        
+    <script src="{% static "play_user.js" %}" type="module"></script>
+    {% if admin %}
+        <script src="{% static "play_admin.js" %}" type="module"></script>
+    {% endif %}
 {% endblock script %}
 
 {% block body %}
@@ -31,7 +30,7 @@
     <a href="{% url 'livequiz:index' %}">Back Home</a>
 
     <input type="hidden" name="gamecode" value={{ gamesession.code }}>
-    <input type="hidden" name="status" value="preparation">
+    <input type="hidden" name="status" value="prep">
 
 
     {% comment %} {% for question in game.questions.all %}
@@ -53,11 +52,16 @@
             not started
         {% endif %} {% endcomment %}
     </section>
-
-    <section id="admincontrol">
-        <button id="start">Start</button>
-        <button id="close">Close</button>
-        <button id="next">Next</button>
+    <section id="message">
     </section>
+
+    {% if admin %}
+        <section id="admincontrol">
+            <button id="start">Start</button>
+            <button id="close">Close</button>
+            <button id="next">Next</button>
+        </section>
+    {% endif %}
+
 
 {% endblock body %}

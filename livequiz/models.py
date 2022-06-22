@@ -51,6 +51,11 @@ class GameSession(models.Model):
     def closequestion(self, *args, **kwargs):
         self.stillopen = False
         return super(GameSession, self).save(*args, **kwargs)
+    
+    def status(self):
+        if not self.active: return "prep"
+        if self.stillopen: return "play"
+        else: return "closed"
 
 
 class QuestionTemplate(models.Model):
