@@ -20,7 +20,7 @@ class GameSession(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="ongoing", null=True)
     code = models.CharField(max_length=6, primary_key=False, editable=False, unique=True)
     active = models.BooleanField(default=False)
-    current_question = models.IntegerField(default=1)
+    current_question = models.IntegerField(default=0)
     stillopen = models.BooleanField(default=True)
     
     def save(self, *args, **kwargs):

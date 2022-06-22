@@ -1,9 +1,8 @@
-from re import S
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest
+from django.core import serializers
 from django.shortcuts import render
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
 from django.views.decorators.csrf import csrf_exempt
 from json import loads
 
@@ -14,13 +13,18 @@ from .forms import GameForm, CodeForm, AddQuesForm
 
 @login_required(login_url="sso:login")
 def index(request):
+    # 'POST' method: delete gamesession (valid as long as gamesession exist & user must be the creator)
     if request.method == "POST":
         session_id = request.POST["session_id"]
         try:
             gamesession = GameSession.objects.get(id = session_id)
         except GameSession.DoesNotExist:
             raise Http404("Gamesession not found!")
+        if request.user != gamesession.host:
+            return HttpResponse("Unauthorized user!", status = 401)
         gamesession.delete()
+    
+    # render dashboard page
     return render(request, "livequiz/index.html", {
         "games": Game.objects.all(),
         "gamesessions": GameSession.objects.all(),
@@ -29,6 +33,7 @@ def index(request):
 
 @login_required(login_url="sso:login")
 def createGame(request):
+    # 'POST' method: handles form submission of new game creation, redirect to edit page
     if request.method == "POST":
         form = GameForm(request.POST)
         if form.is_valid():
@@ -39,54 +44,66 @@ def createGame(request):
             return HttpResponseRedirect(reverse("livequiz:edit", kwargs = {
                 "game_id": newgame.id,
             }))
-        else:
-            return render(request, "livequiz/create.html", { "form": form,})
+        else: return render(request, "livequiz/create.html", { "form": form,})
+        
+    # 'GET' method: render html with empty form
     return render(request, "livequiz/create.html", { "form": GameForm,})
 
 
 @login_required(login_url="sso:login")
 def editGame(request, game_id):
-    game = Game.objects.get(id = game_id)
+    # make sure game_id is valid
+    try: game = Game.objects.get(id = game_id)
+    except KeyError:
+        return HttpResponseBadRequest("Bad request: missing game id!")
+    except Game.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: invalid game id!")
+    
+    # 'POST' method: handles form submission for number of new questions in this game, then refresh page
     if request.method == "POST":
         form = AddQuesForm(request.POST)
         if form.is_valid():
             ques_count = form.cleaned_data["ques_count"]
-            print(type(ques_count))
             for _ in range(int(ques_count)):
                 QuestionType1(game_origin = game, answer = 1).save()
             return HttpResponseRedirect(reverse("livequiz:edit", args = (game_id,)))
         else:
             return render(request, "livequiz/edit.html", {
-                "game": game,
-                "questions": game.questions,
-                "form": form,
+                "game": game, "questions": game.questions, "form": form,
             })
-    else:
-        return render(request, "livequiz/edit.html", {
-            "game": game,
-            "questions": game.questions,
-            "form": AddQuesForm,
-        })
+            
+    # 'GET' method: render edit page with questions and form to add more question
+    return render(request, "livequiz/edit.html", {
+        "game": game, "questions": game.questions, "form": AddQuesForm,
+    })
 
 
 @login_required(login_url="sso:login")
 def hostGame(request):
-    if request.method == "POST": #TODO - check if integer
+    # 'POST' method: creates new game session if game_id is an integer and valid, redirect to play page
+    if request.method == "POST":
+        try: game_id = int(request.POST["game_id"])
+        except TypeError: return render(request, "livequiz/host.html", {
+                "message": "Game ID must be an integer!"
+            })
         game_id = int(request.POST["game_id"])
         if game_id not in list(Game.objects.all().values_list('id', flat = True)):
             return render(request, "livequiz/host.html", {
-                "message": "Invalid Game ID",
+                "message": "Invalid Game ID!",
             })
         game_session = GameSession.objects.create(host = request.user,
                                    game = Game.objects.get(id = game_id))
         return HttpResponseRedirect(reverse("livequiz:play", kwargs = {
-            "game_code": game_session.code
+            "game_code": game_session.code,
         }))
+
+    # 'GET' method: renders the host html page
     return render(request, "livequiz/host.html")
 
 
 @login_required(login_url="sso:login")
 def enterGame(request):
+    # 'POST' method: handles form submission, if valid redirect to play page as participants
     if request.method == "POST":
         form = CodeForm(request.POST)
         valid_codes = GameSession.objects.all().values_list('code', flat = True)
@@ -99,50 +116,41 @@ def enterGame(request):
                 "form": form,
                 "error": "invalid code!"
             })
+            
+    # 'GET' method: renders enter code html page and form
     return render(request, "livequiz/enter.html", { "form": CodeForm,})
 
 
+@login_required(login_url="sso:login")
 def playGame(request, game_code):
-    gamesession = GameSession.objects.get(code=game_code)
-    game = gamesession.game
-    print(game)
+    # make sure game_code is valid
+    try: gamesession = GameSession.objects.get(code=game_code)
+    except KeyError:
+        return HttpResponseBadRequest("Bad request: missing game session code!")
+    except GameSession.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: invalid game session code!")
     
+    # render play page (interaction & functionality made through js and api routes)
+    gamesession = GameSession.objects.get(code=game_code)
     return render(request, "livequiz/play.html", {
-        "game": game,
+        "game": gamesession.game,
         "active": gamesession.active,
         "gamesession": gamesession,
         "admin": request.user == gamesession.host,
     })
 
-""" action:
-activate --> put
-deactivate --> delete
-retrieve --> get
-checkstarted --> view
-"""
+
 @csrf_exempt
 def retrieveGame(request, game_code):
     print("RETRIEVE GAME API ROUTE")
     
     # check if gamesession is valid
-    try: gamesession = GameSession.objects.get(code=game_code)
+    try: gamesession = GameSession.objects.get(code = game_code)
     except GameSession.DoesNotExist:
         return JsonResponse({
             "error": "invalid gamesession"
         }, status = 400)
 
-        # temp = gamesession.game.get_questiontype1_order()
-        # print(x)
-        # print(x[0])
-        # print(x[1])
-        # print(x[2])
-        # print(type(x[1]))
-        
-        # question = QuestionType1.objects.get(id=temp[gamesession.current_question])
-        # print(question.question)
-        # print(gamesession.current_question)
-        # print(gamesession.serialize())
-    
     # return jsonresponse of current question and its options
     if request.method == "VIEW":
         question_ids = gamesession.game.get_questiontype1_order()
@@ -158,7 +166,7 @@ def retrieveGame(request, game_code):
         return JsonResponse({ "status": gamesession.status(),})
     
     # if gamesession is not closed yet, register user's answer
-    elif request.method == "POST":
+    elif request.method == "POST": # TODO - maybe change to 'PUT' method instead??
         if gamesession.status() == "closed" or gamesession.status() == "prep":
             return JsonResponse({ "message": "closed",})
         # create new answerpair & save to database
@@ -174,6 +182,11 @@ def retrieveGame(request, game_code):
             "message": "submitted",
             "answer": a,
         })
+        
+    # TODO - if game not started, add error checking to view as question = 0 result in error
+    # TODO - only able to register answer once for each user, cannot register anymore if already there
+    # TODO - do something if game is over
+    # TODO - tally? display score?
 
 
 @csrf_exempt
@@ -192,7 +205,7 @@ def gameAction(request, game_code):
     if request.user != gamesession.host:
         return JsonResponse({
             "error": "unauthorized user"
-        }, status = 400)
+        }, status = 401)
     
     # 'START' method: activate the game
     if request.method == "START":
@@ -207,9 +220,10 @@ def gameAction(request, game_code):
     # 'NEXT' method: go to the next question
     elif request.method == "NEXT":
         gamesession.nextquestion()
-        return JsonResponse({ "message": "next question",}) #TODO - check if question still exist
+        return JsonResponse({ "message": "next question",})
+    #TODO - check if question still exist, if end of question then do ???
     
-    elif request.method == "RESET": pass
+    elif request.method == "RESET": pass # TODO under consideration ???
     
     # return error for other request method
     else: return JsonResponse({
@@ -235,7 +249,6 @@ def saveQuestion(request, ques_id):
         
     # 'DELETE' method: delete a particular question
     if request.method == "DELETE":
-        game = q.game_origin
         q.delete()
         return JsonResponse({
             "success": "question deleted",
@@ -261,4 +274,3 @@ def saveQuestion(request, ques_id):
     else: return JsonResponse({
             "error": "invalid request method, only accepting PUT and DELETE method"
         }, status = 404)
-
