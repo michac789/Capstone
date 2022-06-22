@@ -20,37 +20,27 @@
     creator: {{ game.creator.username }}<br>
     title: {{ game.title }}<br>
     description: {{ game.description }}<br>
-    time_created: {{ game.time_created }}<br>
+    time_created: {{ game.time_created }}<br>{% endcomment %}
 
-    Code:
+    Total Questions: {{ total_questions }}<br>
+
+    Players (temporary):<br>
+    {% for player in players %}
+        {{ player }}<br>
+    {% endfor %}
+
     <div id="gamecode">
-        {{ gamesession.code }}
-    </div>{% endcomment %}
+        Code: {{ gamesession.code }}
+    </div><br>
 
-    <a href="{% url 'livequiz:index' %}">Back Home</a>
+    <a href="{% url 'livequiz:index' %}">Back Home</a><br>
 
     <input type="hidden" name="gamecode" value={{ gamesession.code }}>
     <input type="hidden" name="status" value="prep">
 
-
-    {% comment %} {% for question in game.questions.all %}
-        <ul>
-            {{ question.question }}
-            <li>{{ question.choice1 }}</li>
-            <li>{{ question.choice2 }}</li>
-            <li>{{ question.choice3 }}</li>
-            <li>{{ question.choice4 }}</li>
-        </ul>
-    {% endfor %}  {% endcomment %}
-
     Play zone
     <section id="playzone">
         Not Started
-        {% comment %} {% if active %}
-            started
-        {% else %}
-            not started
-        {% endif %} {% endcomment %}
     </section>
     <section id="message">
     </section>
@@ -62,6 +52,5 @@
             <button id="next">Next</button>
         </section>
     {% endif %}
-
 
 {% endblock body %}

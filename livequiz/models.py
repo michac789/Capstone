@@ -12,6 +12,9 @@ class Game(models.Model):
     
     def __str__(self):
         return f"<Game {self.id}: {self.title}>"
+    
+    def question_count(self):
+        return QuestionType1.objects.filter(game_origin=self).count()
 
 
 class GameSession(models.Model):
@@ -22,6 +25,7 @@ class GameSession(models.Model):
     active = models.BooleanField(default=False)
     current_question = models.IntegerField(default=0)
     stillopen = models.BooleanField(default=True)
+    finished = models.BooleanField(default=False)
     
     class Meta: verbose_name = "Game Session"
     
@@ -42,9 +46,11 @@ class GameSession(models.Model):
     def activate(self, *args, **kwargs):
         self.current_question = 1
         self.active = True
+        self.finished = False
         return super(GameSession, self).save(*args, **kwargs)
         
     def deactivate(self, *args, **kwargs):
+        self.current_question = 0
         self.active = False
         return super(GameSession, self).save(*args, **kwargs)
         
@@ -60,7 +66,8 @@ class GameSession(models.Model):
     def status(self):
         if not self.active: return "prep"
         if self.stillopen: return "play"
-        else: return "closed"
+        elif not self.finished: return "closed"
+        else: return "finished"
 
 
 class QuestionTemplate(models.Model):
@@ -80,8 +87,6 @@ class QuestionType1(QuestionTemplate):
     choice4 = models.CharField(max_length=64, default="", blank=True, null=True)
     CHOICES = [("1", choice1), ("2", choice2), ("3", choice3), ("4", choice4)]
     answer = models.CharField(max_length=1, choices=CHOICES, default="1")
-    
-    class Meta: verbose_name = "Type 1 Question"
     
     def __eq__(self, other):
         if (self.choice1 == other.choice1 and self.choice2 == other.choice2 and
@@ -117,6 +122,9 @@ class UserSession(models.Model):
     gamesession = models.ForeignKey(GameSession, on_delete=models.CASCADE)
     time_joined = models.DateTimeField(auto_now=True)
     score = models.IntegerField(default=0)
+    
+    def __str__(self):
+        return self.player.username
     
 
 class AnswerPairType1(models.Model):

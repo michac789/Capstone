@@ -8,18 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // player button functionality to choose the correct answer
     let playzone = document.querySelector("#playzone")
     playzone.onclick = (el) => {
-        if (el.target && el.target.matches("#option1")) {
-            console.log("o1")
-            answer(code, 1)
-        } else if (el.target && el.target.matches("#option2")) {
-            console.log("o2")
-            answer(code, 2)
-        } else if (el.target && el.target.matches("#option3")) {
-            console.log("o3")
-            answer(code, 3)
-        } else if (el.target && el.target.matches("#option4")) {
-            console.log("o4")
-            answer(code, 4)
+        if (el.target && el.target.matches("#option1")) { answer(code, 1)
+        } else if (el.target && el.target.matches("#option2")) { answer(code, 2)
+        } else if (el.target && el.target.matches("#option3")) { answer(code, 3)
+        } else if (el.target && el.target.matches("#option4")) { answer(code, 4)
         }
     }
 
@@ -36,9 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (state === "closed") {
             console.log("closed")
             state_closed(code)
-        } else {
+        } else if (state == "answered") {
             console.log("answered")
             state_answered(code)
+        } else {
+            console.log("finished...") // TODO
         }
     }, 1000)
 
@@ -115,12 +109,10 @@ function state_answered(code) {
     .then(response => response.json())
     .then(result => {
         console.log(result)
-        if (result.status === "prep") {
-            document.getElementsByName("status")[0].value = "prep"
-        } else if (result.status === "play") {
-            console.log("...waiting until question is closed...")
-        } else if (result.status === "closed") {
+        if (result.status === "closed") {
             document.getElementsByName("status")[0].value = "closed"
+        } else if (result.status === "finished") {
+            document.getElementsByName("status")[0].value = "finished"
         }
     }).catch(error => console.log(error))
 }
@@ -135,6 +127,8 @@ function state_closed(code) {
         document.getElementById("message").innerHTML = `<h2>Closed</h2>`
         if (result.status == "play") {
             document.getElementsByName("status")[0].value = "prep"
+        } else if (result.status == "finished" ) {
+            document.getElementsByName("status")[0].value = "finished"
         }
     }).catch(error => console.log(error))
 }
@@ -143,7 +137,7 @@ function state_closed(code) {
 function answer(code, ans) {
     console.log("submitting ans...")
     fetch(`/api/retrieve/${code}`, {
-        method: "POST",
+        method: "PUT",
         body: JSON.stringify({ answer: ans,})
     })
     .then(response => response.json())

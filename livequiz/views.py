@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from json import loads
 
-from .models import Game, GameSession, QuestionType1, AnswerPairType1
+from .models import Game, GameSession, QuestionType1, AnswerPairType1, UserSession
 from sso.models import User
 from .forms import GameForm, CodeForm, AddQuesForm
 
@@ -130,13 +130,20 @@ def playGame(request, game_code):
     except GameSession.DoesNotExist:
         return HttpResponseBadRequest("Bad Request: invalid game session code!")
     
+    # create new usersession if there is no existing usersession
+    try: 
+        UserSession.objects.get(player = request.user, gamesession = gamesession)
+    except UserSession.DoesNotExist:
+        UserSession.objects.create(player = request.user, gamesession = gamesession)
+    
     # render play page (interaction & functionality made through js and api routes)
     gamesession = GameSession.objects.get(code=game_code)
     return render(request, "livequiz/play.html", {
         "game": gamesession.game,
-        "active": gamesession.active,
         "gamesession": gamesession,
         "admin": request.user == gamesession.host,
+        "total_questions": gamesession.game.question_count(),
+        "players": UserSession.objects.filter(gamesession = gamesession), # temporary
     })
 
 
@@ -155,38 +162,43 @@ def retrieveGame(request, game_code):
     if request.method == "VIEW":
         question_ids = gamesession.game.get_questiontype1_order()
         curr_ques_no = gamesession.current_question
-        question = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
-        return JsonResponse({
-            "current_question": question.serialize(),
-            "question_no": curr_ques_no,
-        })
+        if 1 <= curr_ques_no <= gamesession.game.question_count():
+            question = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
+            return JsonResponse({
+                "current_question": question.serialize(),
+                "question_no": curr_ques_no,
+            })
+        else: return JsonResponse({
+            "error": "invalid question number"
+        }, status = 404)
     
     # return jsonresponse of current game state (started or not)
     elif request.method == "GET":
+        print(gamesession.status())
         return JsonResponse({ "status": gamesession.status(),})
     
-    # if gamesession is not closed yet, register user's answer
-    elif request.method == "POST": # TODO - maybe change to 'PUT' method instead??
-        if gamesession.status() == "closed" or gamesession.status() == "prep":
+    # if gamesession is still on 'play' state, register user's answer if not registered yet
+    elif request.method == "PUT":
+        if gamesession.status() != "play":
             return JsonResponse({ "message": "closed",})
-        # create new answerpair & save to database
-        data = loads(request.body)
-        a = data["answer"]
         question_ids = gamesession.game.get_questiontype1_order()
         curr_ques_no = gamesession.current_question
+        a = loads(request.body)["answer"]
         q = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
-        ans = AnswerPairType1(player=request.user, answer=a, question=q, gamesession=gamesession)
+        usersession = UserSession.objects.get(player = request.user,
+                                              gamesession = gamesession)
+        answer_pair = AnswerPairType1.objects.filter(question = q, usersession = usersession)
+        if answer_pair.count() != 0:
+            return JsonResponse({
+                "message": "submitted previosly",
+                "answer": answer_pair.answer
+            })
+        ans = AnswerPairType1(answer = a, question = q, usersession = usersession)
         ans.save()
-        # return successful jsonresponse
         return JsonResponse({
             "message": "submitted",
             "answer": a,
         })
-        
-    # TODO - if game not started, add error checking to view as question = 0 result in error
-    # TODO - only able to register answer once for each user, cannot register anymore if already there
-    # TODO - do something if game is over
-    # TODO - tally? display score?
 
 
 @csrf_exempt
@@ -219,11 +231,13 @@ def gameAction(request, game_code):
         
     # 'NEXT' method: go to the next question
     elif request.method == "NEXT":
-        gamesession.nextquestion()
-        return JsonResponse({ "message": "next question",})
-    #TODO - check if question still exist, if end of question then do ???
-    
-    elif request.method == "RESET": pass # TODO under consideration ???
+        if gamesession.current_question < gamesession.game.question_count():
+            gamesession.nextquestion()
+            return JsonResponse({ "message": "next question",})
+        else:
+            gamesession.finished = True
+            gamesession.save()
+            return JsonResponse({ "message": "finished",})
     
     # return error for other request method
     else: return JsonResponse({

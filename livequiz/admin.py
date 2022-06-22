@@ -6,7 +6,7 @@ class GameAdmin(admin.ModelAdmin):
     list_display = ("__str__", "creator")
     
 class GameSessionAdmin(admin.ModelAdmin):
-    list_display = ("__str__", "active", "current_question", "stillopen")
+    list_display = ("__str__", "code", "active", "current_question", "stillopen")
 
 
 admin.site.register(Game, GameAdmin)
