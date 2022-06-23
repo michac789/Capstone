@@ -6,6 +6,10 @@
     background-color: rgb(242, 234, 224);
 }
 
+.bgsidebar {
+    background-color: #6495ED;
+}
+
 @media (min-width: 1000px) {
     .ssoform {
         margin-left: 20%;
@@ -20,4 +24,17 @@
         margin-right: 5%;
         margin-top: 2%
     }
+
+    .hide {
+        visibility: hidden;
+        background-color: red;
+    }
+}
+
+.capstonetitle {
+    font-size: xx-large;
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rebeccapurple;
+    text-decoration: underline;
 }

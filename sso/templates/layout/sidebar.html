@@ -1,0 +1,72 @@
+<ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between">
+    <li class="nav-item m-1 hide">
+        <span class="capstonetitle">Capstone</span>
+    </li>
+    {% if user.is_authenticated %}
+        <li class="nav-item ml-2">
+            <span class="font-weight-bold mt-4">
+                Logged in as:<br><strong>{{ user.username }}</strong>
+            </span>
+        </li>
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="#">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="font-weight-bold">Profile</span>
+            </a>
+        </li>
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:logout' %}">
+                <i class="fa fa-sign-out fa-fw"></i>
+                <span class="d-none d-md-inline">Logout</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <span class="font-weight-bold mt-4">
+                <strong>Not logged in.</strong>
+            </span>
+        </li>
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:login' %}">
+                <i class="fa fa-sign-in fa-fw"></i>
+                <span class="d-none d-md-inline">Login</span>
+            </a>
+        </li>
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:register' %}">
+                <i class="fa fa-external-link-square fa-fw"></i>
+                <span class="d-none d-md-inline">Register</span>
+            </a>
+        </li>
+    {% endif %}
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="#">
+            <i class="fa fa-book fa-fw"></i>
+            <span class="d-none d-md-inline">Dashboard</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="#">
+            <i class="fa fa-star fa-fw"></i>
+            <span class="d-none d-md-inline">Enter Code</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="#">
+            <i class="fa fa-plus-circle fa-fw"></i>
+            <span class="d-none d-md-inline">Create</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="#">
+            <i class="fa fa-newspaper-o fa-fw"></i>
+            <span class="d-none d-md-inline">News</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="#">
+            <i class="fa fa-heart codeply fa-fw"></i>
+            <span class="d-none d-md-inline">Community</span>
+        </a>
+    </li>
+</ul>
