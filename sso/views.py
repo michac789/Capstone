@@ -21,7 +21,13 @@ def loginView(request):
         else: return render(request, "sso/login.html", {
             "message": "Invalid username and/or password!"
         })
-    else: return render(request, "sso/login.html")
+    else:
+        # if user already logged in, redirects to dashboard
+        if request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("livequiz:index"))
+        
+        # if not render login form
+        return render(request, "sso/login.html")
 
 
 def logoutView(request):
