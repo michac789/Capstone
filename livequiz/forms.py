@@ -16,14 +16,7 @@ class CodeForm(forms.Form):
     sessioncode = forms.CharField(label = "Enter code", max_length = 6)
 
 
-class QuestionForm(forms.Form):
-    question = forms.CharField(label = "Question", max_length = 128)
-    choice1 = forms.CharField(label = "Choice 1", max_length = 64)
-    choice2 = forms.CharField(label = "Choice 2", max_length = 64)
-    choice3 = forms.CharField(label = "Choice 3", max_length = 64)
-    choice4 = forms.CharField(label = "Choice 4", max_length = 64)
-    
-    class Meta:
-        model = QuestionType1
-        fields = ["answer"] # BUGGY - TODO
+class AddQuesForm(forms.Form):
+    ques_count = forms.IntegerField(label = "Add these amount of questions",
+                                    min_value = 1, max_value = 10)
 

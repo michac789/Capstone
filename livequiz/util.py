@@ -1,0 +1,11 @@
+# temp = gamesession.game.get_questiontype1_order()
+# print(x)
+# print(x[0])
+# print(x[1])
+# print(x[2])
+# print(type(x[1]))
+
+# question = QuestionType1.objects.get(id=temp[gamesession.current_question])
+# print(question.question)
+# print(gamesession.current_question)
+# print(gamesession.serialize())

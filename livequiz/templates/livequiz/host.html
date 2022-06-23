@@ -1,20 +1,21 @@
 {% extends 'layout/root.html' %}
 
 {% block title %}
-    Create Game
+    Hosting Page
 {% endblock title %}
 
 {% block script %}{% endblock script %}
 
 {% block body %}
-    <h1>CREATE PAGE TODO</h1>
+    <h1>HOSTING PAGE TODO</h1>
 
     <a href="{% url 'livequiz:index' %}">back to home</a>
-
-    <form action="{% url 'livequiz:create' %}" method="POST">
+    
+    <form action="{% url 'livequiz:host' %}" method="post">
         {% csrf_token %}
-        {{ form }}
-        <input type="submit"></input>
+        <input type="text" name="game_id">
+        <button type="submit">Generate Session</button>
     </form>
-
+    {{ message }}
+    
 {% endblock body %}
