@@ -1,0 +1,23 @@
+.test {
+    background-color: red;
+}
+
+.bgsso {
+    background-color: rgb(242, 234, 224);
+}
+
+@media (min-width: 1000px) {
+    .ssoform {
+        margin-left: 20%;
+        margin-right: 20%;
+        margin-top: 3%
+    }
+}
+
+@media (max-width: 999px) {
+    .ssoform {
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-top: 2%
+    }
+}

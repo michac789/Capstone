@@ -1,17 +1,30 @@
 {% extends 'layout/root.html' %}
+{% load static %}
 
 {% block title %}
     Login Page
 {% endblock title %}
 
+{% block script %}
+    <link href="{% static 'sso/layout.css' %}" rel="stylesheet">
+{% endblock script %}
+
 {% block body %}
-    <h2>Login</h2>
+    <div class="p-2 m-2 d-flex justify-content-center">
+        <h2>
+            <span class="border border-secondary p-2 shadow bgsso">
+                Login
+            </span>
+        </h2>
+    </div>
 
     {% if message %}
-        <div>{{ message }}</div>
+        <div class="alert alert-danger container">
+            {{ message }}
+        </div>
     {% endif %}
 
-    <form action="{% url 'sso:login' %}" method="POST">
+    <form action="{% url 'sso:login' %}" method="POST" class="ssoform">
         {% csrf_token %}
         <div class="form-group">
             <input autofocus class="form-control" type="text" name="username" placeholder="Username">
@@ -21,4 +34,10 @@
         </div>
         <input class="btn btn-primary" type="submit" value="Login">
     </form>
+
+    <div class="ssoform">
+        <a href="{% url 'sso:register' %}">
+            Do not have an account yet? Click here to register instead
+        </a>
+    </div>
 {% endblock body %}

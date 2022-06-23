@@ -1,22 +1,52 @@
-<h2>Register</h2>
+{% extends 'layout/root.html' %}
+{% load static %}
 
-{% if message %}
-    <div>{{ message }}</div>
-{% endif %}
+{% block title %}
+    Register Page
+{% endblock title %}
 
-<form action="{% url 'sso:register' %}" method="post">
-    {% csrf_token %}
-    <div class="form-group">
-        <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+{% block script %}
+    <link href="{% static 'sso/layout.css' %}" rel="stylesheet">
+{% endblock script %}
+
+{% block body %}
+    <div class="p-2 m-2 d-flex justify-content-center">
+        <h2>
+            <span class="border border-secondary p-2 shadow bgsso">
+                Register
+            </span>
+        </h2>
     </div>
-    <div class="form-group">
-        <input class="form-control" type="email" name="email" placeholder="Email Address">
+
+    {% if message %}
+        <div class="alert alert-danger container">
+            {{ message }}
+        </div>
+    {% endif %}
+
+    <form action="{% url 'sso:register' %}" method="POST" class="ssoform">
+        {% csrf_token %}
+        <div class="form-group">
+            <input class="form-control" autofocus type="text" name="username" id="username" placeholder="Username" value={{ username }}>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="email" name="email" placeholder="Email Address" value={{ email }}>
+            <small id="emailHelp" class="form-text text-muted">
+                Your email will be used for password reset and won't be shown to public.
+            </small>
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+        </div>
+        <input class="btn btn-primary" type="submit" value="Register">
+    </form>
+    
+    <div class="ssoform">
+        <a href="{% url 'sso:login' %}">
+            Have an account already? Click here to login instead
+        </a>
     </div>
-    <div class="form-group">
-        <input class="form-control" type="password" name="password" placeholder="Password">
-    </div>
-    <div class="form-group">
-        <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
-    </div>
-    <input class="btn btn-primary" type="submit" value="Register">
-</form>
+{% endblock body %}
