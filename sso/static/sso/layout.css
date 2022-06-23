@@ -24,17 +24,20 @@
         margin-right: 5%;
         margin-top: 2%
     }
-
-    .hide {
-        visibility: hidden;
-        background-color: red;
-    }
 }
 
 .capstonetitle {
-    font-size: xx-large;
+    font-size: x-large;
     font-weight: bold;
     font-family: Georgia, 'Times New Roman', Times, serif;
     color: rebeccapurple;
     text-decoration: underline;
+}
+
+.largefont {
+    font-size: 30px;
+}
+
+.superlargefont {
+    font-size: 40px;
 }
