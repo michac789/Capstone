@@ -7,16 +7,30 @@
             <span class="capstonetitle">Capstone</span>
         </li>
     </div>
+    {% comment %} <li class="nav-item ml-2">
+        <span class="font-weight-bold mt-4">
+            {% if user.is_authenticated %}
+                Logged in as:
+            {% else %}
+                <strong>Not logged in.</strong>
+            {% endif %}
+        </span>
+    </li> {% endcomment %}
+    <li class="nav-item ml-2">
+        <span class="font-weight-bold mt-4">
+            <a href="{% url 'sso:comingsoon' %}" class="nav-link pl-0">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="d-none d-md-inline">
+                    {% if user.is_authenticated %}
+                        <strong class="h4">{{ user.username }}</strong>
+                    {% else %}
+                        Not logged in.
+                    {% endif %}
+                </span>
+            </a>
+        </span>
+    </li>
     {% if user.is_authenticated %}
-        <li class="nav-item ml-2">
-            <span class="font-weight-bold mt-4">
-                Logged in as:<br>
-                <a href="{% url 'sso:comingsoon' %}" class="nav-link">
-                    <i class="fa fa-user fa-fw"></i>
-                    <strong>{{ user.username }}</strong>
-                </a>
-            </span>
-        </li>
         <li class="nav-item ml-2">
             <a class="nav-link pl-0" href="{% url 'sso:logout' %}">
                 <i class="fa fa-sign-out fa-fw"></i>
@@ -24,11 +38,6 @@
             </a>
         </li>
     {% else %}
-        <li class="nav-item ml-2">
-            <span class="font-weight-bold mt-4">
-                <strong>Not logged in.</strong>
-            </span>
-        </li>
         <li class="nav-item ml-2">
             <a class="nav-link pl-0" href="{% url 'sso:login' %}">
                 <i class="fa fa-sign-in fa-fw"></i>

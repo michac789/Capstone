@@ -20,16 +20,16 @@ const creappend = (el, attr, args) => {
 
 const capstonetitle = (arg) => {
     document.querySelector("#capstonetitle").innerHTML =
-    creappend("div", {}, [
-        create("li", { "class": "nav-item m-1",}, creappend("div", {}, [
-            create(
-                "span", { "class": `capstonetitle ${arg}`,}, "Capstone"
-            )
-        ]).innerHTML)
-    ]).innerHTML
+        creappend("div", {}, [
+            create("li", { "class": "nav-item m-1",}, creappend("div", {}, [
+                create(
+                    "span", { "class": `capstonetitle ${arg}`,}, "Capstone"
+                )
+            ]).innerHTML)
+        ]).innerHTML
 }
 
-const adjust = () => {
+const adjust_title = () => {
     console.log(window.innerWidth)
     if (window.innerWidth <= 769) {
         document.querySelector("#capstonetitle").innerHTML = ""
@@ -45,7 +45,7 @@ const adjust = () => {
 document.addEventListener("DOMContentLoaded", () => {
     window.dispatchEvent(new Event('resize'));
     window.addEventListener('resize', () => {
-        adjust()
+        adjust_title()
     });
-    adjust()
+    adjust_title()
 })
