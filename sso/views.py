@@ -88,3 +88,7 @@ def register(request):
         else: return render(request, "sso/register.html", {
             "username": "", "email": "",
         })
+        
+
+def comingsoonView(request):
+    return render(request, "layout/comingsoon.html")

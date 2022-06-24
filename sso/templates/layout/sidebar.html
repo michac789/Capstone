@@ -10,14 +10,12 @@
     {% if user.is_authenticated %}
         <li class="nav-item ml-2">
             <span class="font-weight-bold mt-4">
-                Logged in as:<br><strong>{{ user.username }}</strong>
+                Logged in as:<br>
+                <a href="{% url 'sso:comingsoon' %}" class="nav-link">
+                    <i class="fa fa-user fa-fw"></i>
+                    <strong>{{ user.username }}</strong>
+                </a>
             </span>
-        </li>
-        <li class="nav-item ml-2">
-            <a class="nav-link pl-0" href="#">
-                <i class="fa fa-user fa-fw"></i>
-                <span class="d-none d-md-inline h5">Profile</span>
-            </a>
         </li>
         <li class="nav-item ml-2">
             <a class="nav-link pl-0" href="{% url 'sso:logout' %}">
@@ -51,13 +49,13 @@
         </a>
     </li>
     <li class="nav-item ml-2">
-        <a class="nav-link pl-0" href="#">
+        <a class="nav-link pl-0" href="{% url 'livequiz:entercode' %}">
             <i class="fa fa-star fa-fw"></i>
             <span class="d-none d-md-inline h5">Enter Code</span>
         </a>
     </li>
     <li class="nav-item ml-2">
-        <a class="nav-link pl-0" href="#">
+        <a class="nav-link pl-0" href="{% url 'livequiz:create' %}">
             <i class="fa fa-plus-circle fa-fw"></i>
             <span class="d-none d-md-inline h5">Create</span>
         </a>
@@ -69,9 +67,15 @@
         </a>
     </li>
     <li class="nav-item ml-2">
-        <a class="nav-link pl-0" href="#">
+        <a class="nav-link pl-0" href="{% url 'sso:comingsoon' %}">
             <i class="fa fa-heart codeply fa-fw"></i>
             <span class="d-none d-md-inline h5">Community</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="{% url 'sso:comingsoon' %}">
+            <i class="fa fa-question-circle fa-fw"></i>
+            <span class="d-none d-md-inline h5">Guide</span>
         </a>
     </li>
 </ul>
