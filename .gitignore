@@ -4,4 +4,6 @@ livequiz/__pycache__
 livequiz/migrations/__pycache__
 sso/__pycache__
 sso/migrations/__pycache__
+news/__pycache__
+news/migrations/__pycache__
 selftrial.py

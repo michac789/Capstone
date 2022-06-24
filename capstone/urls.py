@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('sso/', include("sso.urls")),
     path("", include("livequiz.urls")),
+    path("news/", include("news.urls")),
     
     # url routes for password reset purpose
     path("accounts/", include("django.contrib.auth.urls")),

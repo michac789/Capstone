@@ -45,7 +45,7 @@
         </li>
     {% endif %}
     <li class="nav-item ml-2">
-        <a class="nav-link pl-0" href="#">
+        <a class="nav-link pl-0" href="{% url 'livequiz:index' %}">
             <i class="fa fa-book fa-fw"></i>
             <span class="d-none d-md-inline h5">Dashboard</span>
         </a>
@@ -63,7 +63,7 @@
         </a>
     </li>
     <li class="nav-item ml-2">
-        <a class="nav-link pl-0" href="#">
+        <a class="nav-link pl-0" href="{% url 'news:index' %}">
             <i class="fa fa-newspaper-o fa-fw"></i>
             <span class="d-none d-md-inline h5">News</span>
         </a>

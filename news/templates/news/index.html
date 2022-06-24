@@ -1,0 +1,34 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    All News
+{% endblock title %}
+
+{% block script %}
+    <link href="{% static 'news/styles.css' %}" rel="stylesheet">
+{% endblock script %}
+
+{% block body %}
+    <div class="container">
+        <section class="h2 pl-2 pt-2">
+            <i class="fa fa-newspaper-o fa-fw"></i>
+            <span class="p-1">News</span>
+        </section>
+        <section class="font-weight-normal">
+            Find information and latest updates about our website here!
+        </section><hr>
+
+        {% if admin %}
+            <section class="h5">
+                Admin control here (coming soon)
+            </section><hr>
+        {% endif %}
+
+        {% for info in infos %}
+            <div class="news_div">
+                {% include 'news/newsdiv.html' %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock body %}
