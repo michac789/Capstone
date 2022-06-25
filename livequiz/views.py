@@ -67,6 +67,12 @@ def editGame(request, game_id):
     except Game.DoesNotExist:
         return HttpResponseBadRequest("Bad Request: invalid game id!")
     
+    # dynamic pagination: allow custom no of question per pages, by default 6
+    if "qperpage" in request.GET:
+        try: num = int(request.GET["qperpage"])
+        except TypeError: num = 6
+    else: num = 6
+    
     # 'POST' method: handles form submission for number of new questions in this game, then refresh page
     if request.method == "POST":
         form = AddQuesForm(request.POST)
@@ -79,16 +85,18 @@ def editGame(request, game_id):
             questions = util.getcount(game.questions.all())
             return render(request, "livequiz/edit.html", {
                 "game": game, "form": form, "active": "create",
-                "questions": util.paginate(request, questions, 3).object_list,
-                "pagination": util.paginate(request, questions, 3),
+                "questions": util.paginate(request, questions, num).object_list,
+                "pagination": util.paginate(request, questions, num),
+                "qperpage": num,
             })
             
     # 'GET' method: render edit page with questions and form to add more question
     questions = util.getcount(game.questions.all())
     return render(request, "livequiz/edit.html", {
         "game": game, "form": AddQuesForm, "active": "create",
-        "questions": util.paginate(request, questions, 3).object_list,
-        "pagination": util.paginate(request, questions, 3),
+        "questions": util.paginate(request, questions, num).object_list,
+        "pagination": util.paginate(request, questions, num),
+        "qperpage": num,
     })
 
 
