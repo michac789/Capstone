@@ -23,4 +23,5 @@ class CodeForm(forms.Form):
 
 class AddQuesForm(forms.Form):
     ques_count = forms.IntegerField(label = "Add these amount of questions",
-                                    min_value = 1, max_value = 10)
+                                    min_value = 1, max_value = 10,
+                                    initial = 1)

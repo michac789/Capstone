@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from json import loads
 
+from . import util
 from .models import Game, GameSession, QuestionType1, AnswerPairType1, UserSession
-from sso.models import User
 from .forms import GameForm, CodeForm, AddQuesForm
 
 
@@ -59,7 +59,6 @@ def createGame(request):
     })
 
 
-@login_required(login_url="sso:login")
 def editGame(request, game_id):
     # make sure game_id is valid
     try: game = Game.objects.get(id = game_id)
@@ -77,13 +76,19 @@ def editGame(request, game_id):
                 QuestionType1(game_origin = game, answer = 1).save()
             return HttpResponseRedirect(reverse("livequiz:edit", args = (game_id,)))
         else:
+            questions = util.getcount(game.questions.all())
             return render(request, "livequiz/edit.html", {
-                "game": game, "questions": game.questions, "form": form, "active": "create",
+                "game": game, "form": form, "active": "create",
+                "questions": util.paginate(request, questions, 3).object_list,
+                "pagination": util.paginate(request, questions, 3),
             })
             
     # 'GET' method: render edit page with questions and form to add more question
+    questions = util.getcount(game.questions.all())
     return render(request, "livequiz/edit.html", {
-        "game": game, "questions": game.questions, "form": AddQuesForm, "active": "create",
+        "game": game, "form": AddQuesForm, "active": "create",
+        "questions": util.paginate(request, questions, 3).object_list,
+        "pagination": util.paginate(request, questions, 3),
     })
 
 

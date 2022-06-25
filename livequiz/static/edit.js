@@ -109,5 +109,9 @@ function deletequestion(id) {
     }).then(response => response.json()
     ).then(_ => {
         window.location.reload()
+        //window.location.href = `http://${window.location.host}${window.location.pathname}?page=2`
+        path.reload()
+        document.querySelector(`.questiondiv[data-quesid='${id}']>.questioneditable`).innerHTML =
+            "Question deleted, please click here to reload..."
     }).catch(error => console.log(error))
 }
