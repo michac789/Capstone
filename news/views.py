@@ -8,6 +8,7 @@ def index(request):
         "infos": Information.objects.all(),
         "admin": (False if request.user.is_anonymous else
                   request.user.status in ["T1", "T2"]),
+        "active": "news",
     })
 
 
@@ -17,4 +18,5 @@ def renderPage(request, id):
         "md": Information.objects.get(id = id).serialize(),
         "admin": (False if request.user.is_anonymous else
                   request.user.status in ["T1", "T2"]),
+        "active": "news",
     })

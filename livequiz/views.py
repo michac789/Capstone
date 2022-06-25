@@ -28,6 +28,7 @@ def index(request):
     return render(request, "livequiz/index.html", {
         "games": Game.objects.all(),
         "gamesessions": GameSession.objects.all(),
+        "active": "index",
     })
 
 
@@ -44,10 +45,10 @@ def createGame(request):
             return HttpResponseRedirect(reverse("livequiz:edit", kwargs = {
                 "game_id": newgame.id,
             }))
-        else: return render(request, "livequiz/create.html", { "form": form,})
+        else: return render(request, "livequiz/create.html", { "form": form, "active": "create",})
         
     # 'GET' method: render html with empty form
-    return render(request, "livequiz/create.html", { "form": GameForm,})
+    return render(request, "livequiz/create.html", { "form": GameForm, "active": "create",})
 
 
 @login_required(login_url="sso:login")
@@ -69,12 +70,12 @@ def editGame(request, game_id):
             return HttpResponseRedirect(reverse("livequiz:edit", args = (game_id,)))
         else:
             return render(request, "livequiz/edit.html", {
-                "game": game, "questions": game.questions, "form": form,
+                "game": game, "questions": game.questions, "form": form, "active": "create",
             })
             
     # 'GET' method: render edit page with questions and form to add more question
     return render(request, "livequiz/edit.html", {
-        "game": game, "questions": game.questions, "form": AddQuesForm,
+        "game": game, "questions": game.questions, "form": AddQuesForm, "active": "create",
     })
 
 
@@ -89,7 +90,7 @@ def hostGame(request):
         game_id = int(request.POST["game_id"])
         if game_id not in list(Game.objects.all().values_list('id', flat = True)):
             return render(request, "livequiz/host.html", {
-                "message": "Invalid Game ID!",
+                "message": "Invalid Game ID!", "active": "create",
             })
         game_session = GameSession.objects.create(host = request.user,
                                    game = Game.objects.get(id = game_id))
@@ -98,7 +99,7 @@ def hostGame(request):
         }))
 
     # 'GET' method: renders the host html page
-    return render(request, "livequiz/host.html")
+    return render(request, "livequiz/host.html", { "active": "create",})
 
 
 @login_required(login_url="sso:login")
@@ -114,11 +115,12 @@ def enterGame(request):
         else:
             return render(request, "livequiz/enter.html", {
                 "form": form,
-                "error": "invalid code!"
+                "error": "invalid code!",
+                "active": "entercode",
             })
             
     # 'GET' method: renders enter code html page and form
-    return render(request, "livequiz/enter.html", { "form": CodeForm,})
+    return render(request, "livequiz/enter.html", { "form": CodeForm, "active": "entercode",})
 
 
 @login_required(login_url="sso:login")
@@ -144,6 +146,7 @@ def playGame(request, game_code):
         "admin": request.user == gamesession.host,
         "total_questions": gamesession.game.question_count(),
         "players": UserSession.objects.filter(gamesession = gamesession), # temporary
+        "active": "entercode"
     })
 
 
