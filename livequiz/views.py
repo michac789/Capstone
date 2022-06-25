@@ -32,7 +32,6 @@ def index(request):
     })
 
 
-@login_required(login_url="sso:login")
 def createGame(request):
     # 'POST' method: handles form submission of new game creation, redirect to edit page
     if request.method == "POST":
@@ -45,10 +44,19 @@ def createGame(request):
             return HttpResponseRedirect(reverse("livequiz:edit", kwargs = {
                 "game_id": newgame.id,
             }))
-        else: return render(request, "livequiz/create.html", { "form": form, "active": "create",})
+        else: return render(request, "livequiz/create.html", {
+            "form": form, "active": "create",
+        })
+        
+    # those who have not logged in yet can't fill form nor see their games
+    if request.user.is_anonymous:
+        return render(request, "livequiz/create.html", { "anonymous": True, "active": "create",})
         
     # 'GET' method: render html with empty form
-    return render(request, "livequiz/create.html", { "form": GameForm, "active": "create",})
+    return render(request, "livequiz/create.html", {
+        "form": GameForm, "active": "create",
+        "mygames": Game.objects.filter(creator = request.user),
+    })
 
 
 @login_required(login_url="sso:login")
