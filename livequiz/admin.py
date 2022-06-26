@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Game, GameSession, QuestionType1, AnswerPairType1
+from .models import Game, GameSession, QuestionType1, AnswerPairType1, UserSession
 
 # Register your models here.
 class GameAdmin(admin.ModelAdmin):
@@ -13,3 +13,4 @@ admin.site.register(Game, GameAdmin)
 admin.site.register(GameSession, GameSessionAdmin)
 admin.site.register(QuestionType1)
 admin.site.register(AnswerPairType1)
+admin.site.register(UserSession)

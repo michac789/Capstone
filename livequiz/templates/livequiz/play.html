@@ -6,7 +6,7 @@
 {% endblock title %}
 
 {% block script %}
-    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <link href="{% static 'livequiz/play.css' %}" rel="stylesheet">
     <script src="{% static "play_user.js" %}" type="module"></script>
     {% if admin %}
         <script src="{% static "play_admin.js" %}" type="module"></script>
@@ -14,43 +14,66 @@
 {% endblock script %}
 
 {% block body %}
-    {% comment %} <h1>PLAY PAGE - TODO</h1>
-    id: {{ game.id }}<br>
-    game_id: {{ game.game_id }}<br>
-    creator: {{ game.creator.username }}<br>
-    title: {{ game.title }}<br>
-    description: {{ game.description }}<br>
-    time_created: {{ game.time_created }}<br>{% endcomment %}
+    <div class="container">
+        <header>
+            <section class="h5">
+                Game Name: {{ game.title }}
+            </section>
+            <section class="text-weight-normal ml-2">
+                Hosted by: <i><b>{{ gamesession.host.username }}</b></i>
+            </section>
+            <section class="text-weight-normal ml-2">
+                Session Code: <mark><u>{{ gamesession.code }}</u></mark>
+            </section>
+        </header><hr>
 
-    Total Questions: {{ total_questions }}<br>
+        {% if admin %}
+            <div class="border p-2">
+                <section class="h5">
+                    <u>Admin View</u>
+                </section>
+                <section class="text-muted">
+                    <p>
+                        Note: Only you (the host) is able to see this section.
+                        You can click these buttons to control the flow of the game.
+                        You can also see the stats for all of the participants.
+                    </p>
+                </section>
 
-    Players (temporary):<br>
-    {% for player in players %}
-        {{ player }}<br>
-    {% endfor %}
+                <section id="admincontrol" class="text-center">
+                    <button id="start" class="btn btn-outline-primary">
+                        Start
+                    </button>
+                    <button id="close" class="btn btn-outline-warning">
+                        Close
+                    </button>
+                    <button id="next" class="btn btn-outline-success">
+                        Next
+                    </button>
+                </section><hr>
 
-    <div id="gamecode">
-        Code: {{ gamesession.code }}
-    </div><br>
+                <span class="h5">All joined players:</span><br>
+                <section class="wrap">
+                    {% for player in players %}
+                        <div class="text-weight-normal namediv">
+                            {{ player }}<br>
+                        </div>
+                    {% endfor %}
+                </section>
+            </div><hr>
+        {% endif %}
 
-    <a href="{% url 'livequiz:index' %}">Back Home</a><br>
-
-    <input type="hidden" name="gamecode" value={{ gamesession.code }}>
-    <input type="hidden" name="status" value="prep">
-
-    Play zone
-    <section id="playzone">
-        Not Started
-    </section>
-    <section id="message">
-    </section>
-
-    {% if admin %}
-        <section id="admincontrol">
-            <button id="start">Start</button>
-            <button id="close">Close</button>
-            <button id="next">Next</button>
+        <input type="hidden" name="gamecode" value={{ gamesession.code }}>
+        <input type="hidden" name="status" value="prep">
+        
+        <div class="h4 text-center">
+            Question <span id="curques">1</span> out of {{ total_questions }}
+        </div>
+        <section id="playzone">
+            Not Started
         </section>
-    {% endif %}
-
+        <section id="message">
+            waiting for host to start the session...
+        </section>
+    </div>
 {% endblock body %}

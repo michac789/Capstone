@@ -6,53 +6,83 @@
 {% endblock title %}
 
 {% block script %}
-    <link href="{% static 'styles.css' %}" rel="stylesheet">
+    <link href="{% static 'livequiz/create.css' %}" rel="stylesheet">
     <script src="{% static "index.js" %}" type="module"></script>
 {% endblock script %}
 
 {% block body %}
-    <h1>Dashboard TODO</h1>
+    <div class="container">
+        <section class="h2 pl-2 pt-2">
+            <i class="fa fa-book fa-fw"></i>
+            <span class="p-1">Dashboard</span>
+        </section><hr>
 
-    <a href="{% url 'livequiz:entercode' %}">Enter Code</a><br>
-    <a href="{% url 'livequiz:create' %}">Create Game</a><br>
-    ...
-    
-    <h3>All games</h3>
-    <ol>
-        {% for game in games %}
-            <li><ul>
-                <li>Game ID: {{ game.id }}</li>
-                <li>Creator: {{ game.creator.username }}</li>
-                <li>Title: {{ game.title }}</li>
-                <li>Description: {{ game.description }}</li>
-                <li>Date created: {{ game.date_created }}</li>
-                <a href="#">Play - TODO</a>
-                <a href="{% url 'livequiz:edit' game_id=game.id %}">
-                    Edit Game (for creator only)
-                </a>
-            </ul></li><br>
-        {% endfor %}
-    </ol>
+        <section class="h3"><u>All Games</u></section>
 
-    <h3>All active game sessions:</h3>
-    <ol>
-        {% for gamesession in gamesessions %}
-            <li><ul>
-                <li>Game: {{ gamesession.game.title }}</li>
-                <li>Code: {{ gamesession.code }}</li>
-                <li>Host: {{ gamesession.host }}</li>
-                <li><a href="{% url 'livequiz:play' game_code=gamesession.code %}">
-                    Play
-                </a></li>
-                {% if gamesession.host == request.user %}
-                    <form action="{% url 'livequiz:index' %}" method="POST">
-                        {% csrf_token %}
-                        <input type="hidden" name="session_id" value={{ gamesession.id }}>
-                        <button type="submit">Delete</button>
-                    </form>
-                {% endif %}
-            </ul></li>
-        {% endfor %}
-    </ol>
-    
+        <div class="wrap">
+            {% for game in games %}
+                <div class="gamediv">
+                    <section class="h5">
+                        <wrap>{{ game.title }}</wrap>
+                    </section>
+                    <section class="font-weight-normal">
+                        Creator: <b>{{ game.creator.username }}</b>
+                    </section>
+                    <section class="text-center">
+                        <a href="{% url 'livequiz:edit' game_id=game.id %}">
+                            <button class="btn btn-warning m-2 px-3">
+                                View
+                            </button>
+                        </a>
+                        <form action="{% url 'livequiz:host' game_id=game.id %}" class="inl" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-info m-2 px-3">
+                                Host
+                            </button>
+                        </form>
+                    </section>
+                </div>
+            {% empty %}
+                You have not created any games yet.
+            {% endfor %}
+        </div><hr>
+        
+        <section class="h3"><u>All Active Game Sessions</u></section>
+
+        <div class="wrap">
+            {% for gamesession in gamesessions %}
+                <div class="gamediv heightplus">
+                    <section class="font-weight-bold">
+                        Game: <b>{{ gamesession.game.title }}</b>
+                    </section>
+                    <section class="font-weight-normal">
+                        Code: <strong>{{ gamesession.code }}</strong>
+                    </section>
+                    <section class="font-weight-normal">
+                        Host: <strong>{{ gamesession.host }}</strong>
+                    </section>
+                    <section class="text-center">
+                        <a href="{% url 'livequiz:play' game_code=gamesession.code %}">
+                            <button class="btn btn-success m-2 px-3">
+                                Join
+                            </button>
+                        </a>
+                        {% if gamesession.host == request.user %}
+                            <form action="{% url 'livequiz:index' %}" method="POST" class="inl">
+                                {% csrf_token %}
+                                <input type="hidden" name="session_id" value={{ gamesession.id }}>
+                                <button type="submit" class="btn btn-danger m-2 px-3">
+                                    Delete
+                                </button>
+                            </form>
+                        {% endif %}
+                    </section>
+                </div>
+            {% empty %}
+                <section class="h5">
+                    No active session available currently.
+                </section>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock body %}

@@ -35,9 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("finished...") // TODO
         }
     }, 1000)
-
-    // TODO - before going to 'closed' state, automatically disable all buttons
-    // TODO - handle end of question
 })
 
 // 'prep' state: check game state from the server, change to 'play' or 'closed' state
@@ -63,12 +60,17 @@ function state_prep(code) {
 // render DOM components first before switching from 'prep' state to 'play'/'closed' state
 function init() {
     document.getElementById("playzone").innerHTML = creappend("div", {}, [
-        create("div", { "id": "question",}, "loading question..."),
-        create("button", { "id": "option1", "class": "options",}, "loading..."),
+        create("div", { "id": "question",
+        "class": "border border-primary m-1 p-3 h3",},
+        "loading question..."),
+        create("button", { "id": "option1", "class": "options text-center",}, "loading..."),
         create("button", { "id": "option2", "class": "options",}, "loading..."),
         create("button", { "id": "option3", "class": "options",}, "loading..."),
         create("button", { "id": "option4", "class": "options",}, "loading..."),
     ]).innerHTML
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`option${i}`).style.backgroundColor = "rgb(240, 240, 240)"
+    }
 }
 
 // render questions after calling init when switching to play state
@@ -76,13 +78,13 @@ function render_question(code) {
     fetch(`/api/retrieve/${code}`, { method: "VIEW",})
     .then(response => response.json())
     .then(result => {
-        console.log(result)
         const { current_question, question_no } = result
         document.getElementById("question").innerHTML = current_question.question
         document.getElementById("option1").innerHTML = current_question.choice1
         document.getElementById("option2").innerHTML = current_question.choice2
         document.getElementById("option3").innerHTML = current_question.choice3
         document.getElementById("option4").innerHTML = current_question.choice4
+        document.getElementById("curques").innerHTML = question_no
     })
     document.getElementById("message").innerHTML = "Answer before the question is closed..."
 }
@@ -125,6 +127,7 @@ function state_closed(code) {
     .then(result => {
         console.log(result)
         document.getElementById("message").innerHTML = `<h2>Closed</h2>`
+        show_answer(code)
         if (result.status == "play") {
             document.getElementsByName("status")[0].value = "prep"
         } else if (result.status == "finished" ) {
@@ -145,9 +148,34 @@ function answer(code, ans) {
         console.log(result)
         if (result.message == "closed") {
             document.getElementsByName("status")[0].value = "closed"
+        } else {
+            document.getElementById(`option${result.answer}`).style.backgroundColor = "lightblue"
+            document.getElementsByName("status")[0].value = "answered"
+            document.getElementById("message").innerHTML =
+                `you answered option ${result.answer}, waiting for next question`
         }
-        document.getElementsByName("status")[0].value = "answered"
-        document.getElementById("message").innerHTML =
-            `you answered option ${result.answer}, waiting for next question`
+    }).catch(error => console.log(error))
+}
+
+// display correct answer on screen (when question is closed)
+function show_answer(code) {
+    console.log("show answer...")
+    fetch(`/api/retrieve/${code}`, { method: "FETCH",})
+    .then(response => response.json())
+    .then(result => {
+        console.log("BALABALABALA")
+        console.log(result)
+        document.getElementById("message").innerHTML = `<h2>Closed...</h2>`
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`option${i}`).style.backgroundColor = "rgb(140, 140, 140)"
+        }
+        if (result.your_answer == result.correct_answer) {
+            document.getElementById(`option${result.your_answer}`).style.backgroundColor = "lightgreen"
+            document.getElementById("message").append("You get the correct answer!")
+        } else {
+            document.getElementById(`option${result.your_answer}`).style.backgroundColor = "red"
+            document.getElementById(`option${result.correct_answer}`).style.backgroundColor = "pink"
+            document.getElementById("message").append("You get the wrong answer!")
+        }
     }).catch(error => console.log(error))
 }
