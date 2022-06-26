@@ -161,6 +161,35 @@ def playGame(request, game_code):
         "players": UserSession.objects.filter(gamesession = gamesession), # temporary
         "active": "entercode"
     })
+    
+    
+@login_required(login_url="sso:login")
+def result(request, game_code):
+    # make sure game_code is valid
+    try: gamesession = GameSession.objects.get(code=game_code)
+    except KeyError:
+        return HttpResponseBadRequest("Bad request: missing game session code!")
+    except GameSession.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: invalid game session code!")
+    
+    # tally all scores
+    usersessions = UserSession.objects.filter(gamesession = gamesession)
+    for usersession in usersessions:
+        score = 0
+        answers = AnswerPairType1.objects.filter(usersession = usersession)
+        for answer in answers:
+            if answer.answer == answer.question.answer:
+                score += 1
+        usersession.updatescore(score)
+        
+    print(type(AnswerPairType1.objects.filter(usersession = usersession)))
+    print(AnswerPairType1.objects.filter(usersession = usersession)[0])
+        
+    # render page
+    return render(request, "livequiz/result.html", {
+        "scores": UserSession.objects.filter(gamesession=gamesession).exclude(player=gamesession.host).order_by("-score"),
+        "game": gamesession.game,
+    })
 
 
 @csrf_exempt

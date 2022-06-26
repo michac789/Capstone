@@ -33,6 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
             state_answered(code)
         } else {
             console.log("finished...") // TODO
+            window.location.href = `http://${window.location.host}/result/${code}`
         }
     }, 1000)
 })
@@ -53,6 +54,8 @@ function state_prep(code) {
         } else if (result.status === "closed") {
             init()
             document.getElementsByName("status")[0].value = "closed"
+        } else if (result.status === "finished") {
+            document.getElementsByName("status")[0].value = "finished"
         }
     }).catch(error => console.log(error))
 }
@@ -163,7 +166,6 @@ function show_answer(code) {
     fetch(`/api/retrieve/${code}`, { method: "FETCH",})
     .then(response => response.json())
     .then(result => {
-        console.log("BALABALABALA")
         console.log(result)
         document.getElementById("message").innerHTML = `<h2>Closed...</h2>`
         for (let i = 1; i <= 4; i++) {
@@ -173,7 +175,9 @@ function show_answer(code) {
             document.getElementById(`option${result.your_answer}`).style.backgroundColor = "lightgreen"
             document.getElementById("message").append("You get the correct answer!")
         } else {
-            document.getElementById(`option${result.your_answer}`).style.backgroundColor = "red"
+            if (result.your_answer != 0) {
+                document.getElementById(`option${result.your_answer}`).style.backgroundColor = "red"
+            }
             document.getElementById(`option${result.correct_answer}`).style.backgroundColor = "pink"
             document.getElementById("message").append("You get the wrong answer!")
         }

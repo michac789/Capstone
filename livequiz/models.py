@@ -119,6 +119,10 @@ class UserSession(models.Model):
     def __str__(self):
         return self.player.username
     
+    def updatescore(self, score):
+        self.score = score
+        return self.save()
+    
 
 class AnswerPairType1(models.Model):
     CHOICES = [("0", "unanswered"), ("1", "c1"), ("2", "c2"), ("3", "c3"), ("4", "c4")]

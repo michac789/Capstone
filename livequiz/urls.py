@@ -10,6 +10,7 @@ urlpatterns = [
     path("host/<int:game_id>", views.hostGame, name="host"),
     path("play/entercode", views.enterGame, name="entercode"),
     path("play/<str:game_code>", views.playGame, name="play"),
+    path("result/<str:game_code>", views.result, name="result"),
     
     # API routes
     path("api/retrieve/<str:game_code>", views.retrieveGame),
