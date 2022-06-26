@@ -4,20 +4,30 @@
 <html lang="en">
 <head>
     <title>{% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="{% static 'sso/layout.css' %}" rel="stylesheet">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block script %}{% endblock script %}
 </head>
 <body>
-    #TODO - NavBar <br>
-    {% if user.is_authenticated %}
-        Logged in as {{user.username}}.
-    {% else %} 
-        Not logged in.
-    {% endif %}
-    <div class="body">
-        {% block body %}{% endblock body %}
+    <div class="container-fluid">
+        <div class="row min-vh-100 flex-column flex-md-row">
+            <aside class="col-12 col-md-2 p-0 bgsidebar flex-shrink-1">
+                <nav class="navbar sticky-top navbar-expand navbar-dark bgsidebar flex-md-column flex-row align-items-start py-2">
+                    <div class="collapse navbar-collapse col-fixed">
+                        {% include 'layout/sidebar.html' %}
+                    </div>
+                </nav>
+            </aside>
+            <main class="col bg-faded py-3 flex-grow-1">
+                <div class="body">
+                    {% block body %}{% endblock body %}
+                </div>
+            </main>
+        </div>
     </div>
 </body>
 </html>

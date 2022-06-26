@@ -1,0 +1,136 @@
+{% load static %}
+<script src="{% static "sso/sso.js" %}" type="module"></script>
+
+<ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between">
+    <div id="capstonetitle">
+        <li class="nav-item m-1 hide">
+            <span class="capstonetitle">Capstone</span>
+        </li>
+    </div>
+    <li class="nav-item ml-2">
+        <span class="font-weight-bold mt-4">
+            <a href="{% url 'sso:comingsoon' %}" class="nav-link pl-0">
+                <i class="fa fa-user fa-fw"></i>
+                <span class="d-none d-md-inline">
+                    {% if user.is_authenticated %}
+                        <strong class="h4">{{ user.username }}</strong>
+                    {% else %}
+                        Not logged in.
+                    {% endif %}
+                </span>
+            </a>
+        </span>
+    </li>
+    {% if user.is_authenticated %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:logout' %}">
+                <i class="fa fa-sign-out fa-fw"></i>
+                <span class="d-none d-md-inline h5">Logout</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:login' %}">
+                <i class="fa fa-sign-in fa-fw"></i>
+                <span class="d-none d-md-inline h5">Login</span>
+            </a>
+        </li>
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'sso:register' %}">
+                <i class="fa fa-external-link-square fa-fw"></i>
+                <span class="d-none d-md-inline h5">Register</span>
+            </a>
+        </li>
+    {% endif %}
+
+    {% if active == "index" %}
+        <li class="nav-item ml-2 active">
+            <a class="nav-link pl-0" href="{% url 'livequiz:index' %}">
+                <i class="fa fa-book fa-fw"></i>
+                <span class="d-none d-md-inline h5">Dashboard</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'livequiz:index' %}">
+                <i class="fa fa-book fa-fw"></i>
+                <span class="d-none d-md-inline h5">Dashboard</span>
+            </a>
+        </li>
+    {% endif %}
+    
+    {% if active == "entercode" %}
+        <li class="nav-item ml-2 active">
+            <a class="nav-link pl-0" href="{% url 'livequiz:entercode' %}">
+                <i class="fa fa-star fa-fw"></i>
+                <span class="d-none d-md-inline h5">Enter Code</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'livequiz:entercode' %}">
+                <i class="fa fa-star fa-fw"></i>
+                <span class="d-none d-md-inline h5">Enter Code</span>
+            </a>
+        </li>
+    {% endif %}
+
+    {% if active == "create" %}
+        <li class="nav-item ml-2 active">
+            <a class="nav-link pl-0" href="{% url 'livequiz:create' %}">
+                <i class="fa fa-plus-circle fa-fw"></i>
+                <span class="d-none d-md-inline h5">Create</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'livequiz:create' %}">
+                <i class="fa fa-plus-circle fa-fw"></i>
+                <span class="d-none d-md-inline h5">Create</span>
+            </a>
+        </li>
+    {% endif %}
+    
+    {% if active == "news" %}
+        <li class="nav-item ml-2 active">
+            <a class="nav-link pl-0" href="{% url 'news:index' %}">
+                <i class="fa fa-newspaper-o fa-fw"></i>
+                <span class="d-none d-md-inline h5">News</span>
+            </a>
+        </li>
+    {% else %}
+        <li class="nav-item ml-2">
+            <a class="nav-link pl-0" href="{% url 'news:index' %}">
+                <i class="fa fa-newspaper-o fa-fw"></i>
+                <span class="d-none d-md-inline h5">News</span>
+            </a>
+        </li>
+    {% endif %}
+
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="{% url 'sso:comingsoon' %}">
+            <i class="fa fa-heart codeply fa-fw text-muted"></i>
+            <span class="d-none d-md-inline h5 text-muted">Community</span>
+        </a>
+    </li>
+    <li class="nav-item ml-2">
+        <a class="nav-link pl-0" href="{% url 'sso:comingsoon' %}">
+            <i class="fa fa-question-circle fa-fw text-muted"></i>
+            <span class="d-none d-md-inline h5 text-muted">Guide</span>
+        </a>
+    </li>
+
+    <li class="nav-item ml-2 d-none d-md-inline btm-pos">
+        <div class="nav-link pl-0" href="https://github.com/michac789">
+            <a class="colwh" href="https://github.com/michac789">
+                <i class="fa fa-github fa-fw" style="font-size:36px"></i>
+            </a>
+            <a class="colwh" href="https://sg.linkedin.com/in/michael-andrew-chan-144a29219">
+                <i class="fa fa-linkedin-square fa-fw" style="font-size:36px"></i>
+            </a>
+        </div>
+        <div class="colwh p-1">
+            <p>&copy; michac789</p>
+        </div>
+    </li>
+</ul>

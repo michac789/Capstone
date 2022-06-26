@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest
 from django.core import serializers
 from django.shortcuts import render
 from django.urls import reverse
@@ -6,8 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from json import loads
 
+from . import util
 from .models import Game, GameSession, QuestionType1, AnswerPairType1, UserSession
-from sso.models import User
 from .forms import GameForm, CodeForm, AddQuesForm
 
 
@@ -28,10 +28,10 @@ def index(request):
     return render(request, "livequiz/index.html", {
         "games": Game.objects.all(),
         "gamesessions": GameSession.objects.all(),
+        "active": "index",
     })
 
 
-@login_required(login_url="sso:login")
 def createGame(request):
     # 'POST' method: handles form submission of new game creation, redirect to edit page
     if request.method == "POST":
@@ -44,13 +44,21 @@ def createGame(request):
             return HttpResponseRedirect(reverse("livequiz:edit", kwargs = {
                 "game_id": newgame.id,
             }))
-        else: return render(request, "livequiz/create.html", { "form": form,})
+        else: return render(request, "livequiz/create.html", {
+            "form": form, "active": "create",
+        })
+        
+    # those who have not logged in yet can't fill form nor see their games
+    if request.user.is_anonymous:
+        return render(request, "livequiz/create.html", { "anonymous": True, "active": "create",})
         
     # 'GET' method: render html with empty form
-    return render(request, "livequiz/create.html", { "form": GameForm,})
+    return render(request, "livequiz/create.html", {
+        "form": GameForm, "active": "create",
+        "mygames": Game.objects.filter(creator = request.user),
+    })
 
 
-@login_required(login_url="sso:login")
 def editGame(request, game_id):
     # make sure game_id is valid
     try: game = Game.objects.get(id = game_id)
@@ -58,6 +66,12 @@ def editGame(request, game_id):
         return HttpResponseBadRequest("Bad request: missing game id!")
     except Game.DoesNotExist:
         return HttpResponseBadRequest("Bad Request: invalid game id!")
+    
+    # dynamic pagination: allow custom no of question per pages, by default 6
+    if "qperpage" in request.GET:
+        try: num = int(request.GET["qperpage"])
+        except TypeError: num = 6
+    else: num = 6
     
     # 'POST' method: handles form submission for number of new questions in this game, then refresh page
     if request.method == "POST":
@@ -68,37 +82,37 @@ def editGame(request, game_id):
                 QuestionType1(game_origin = game, answer = 1).save()
             return HttpResponseRedirect(reverse("livequiz:edit", args = (game_id,)))
         else:
+            questions = util.getcount(game.questions.all())
             return render(request, "livequiz/edit.html", {
-                "game": game, "questions": game.questions, "form": form,
+                "game": game, "form": form, "active": "create",
+                "questions": util.paginate(request, questions, num).object_list,
+                "pagination": util.paginate(request, questions, num),
+                "qperpage": num,
             })
             
     # 'GET' method: render edit page with questions and form to add more question
+    questions = util.getcount(game.questions.all())
     return render(request, "livequiz/edit.html", {
-        "game": game, "questions": game.questions, "form": AddQuesForm,
+        "game": game, "form": AddQuesForm, "active": "create",
+        "questions": util.paginate(request, questions, num).object_list,
+        "pagination": util.paginate(request, questions, num),
+        "qperpage": num,
     })
 
 
 @login_required(login_url="sso:login")
-def hostGame(request):
+def hostGame(request, game_id):
     # 'POST' method: creates new game session if game_id is an integer and valid, redirect to play page
     if request.method == "POST":
-        try: game_id = int(request.POST["game_id"])
-        except TypeError: return render(request, "livequiz/host.html", {
-                "message": "Game ID must be an integer!"
-            })
-        game_id = int(request.POST["game_id"])
         if game_id not in list(Game.objects.all().values_list('id', flat = True)):
-            return render(request, "livequiz/host.html", {
-                "message": "Invalid Game ID!",
-            })
+            return Http404("Game ID not found!")
         game_session = GameSession.objects.create(host = request.user,
                                    game = Game.objects.get(id = game_id))
         return HttpResponseRedirect(reverse("livequiz:play", kwargs = {
             "game_code": game_session.code,
         }))
-
-    # 'GET' method: renders the host html page
-    return render(request, "livequiz/host.html")
+    else:
+        return HttpResponseForbidden("This route only supports 'POST' method!")
 
 
 @login_required(login_url="sso:login")
@@ -114,11 +128,12 @@ def enterGame(request):
         else:
             return render(request, "livequiz/enter.html", {
                 "form": form,
-                "error": "invalid code!"
+                "error": "invalid code!",
+                "active": "entercode",
             })
             
     # 'GET' method: renders enter code html page and form
-    return render(request, "livequiz/enter.html", { "form": CodeForm,})
+    return render(request, "livequiz/enter.html", { "form": CodeForm, "active": "entercode",})
 
 
 @login_required(login_url="sso:login")
@@ -144,6 +159,7 @@ def playGame(request, game_code):
         "admin": request.user == gamesession.host,
         "total_questions": gamesession.game.question_count(),
         "players": UserSession.objects.filter(gamesession = gamesession), # temporary
+        "active": "entercode"
     })
 
 

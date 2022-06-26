@@ -6,6 +6,7 @@
 {% endblock title %}
 
 {% block script %}
+    <link href="{% static 'styles.css' %}" rel="stylesheet">
     <script src="{% static "index.js" %}" type="module"></script>
 {% endblock script %}
 
@@ -14,7 +15,7 @@
 
     <a href="{% url 'livequiz:entercode' %}">Enter Code</a><br>
     <a href="{% url 'livequiz:create' %}">Create Game</a><br>
-    <a href="{% url 'livequiz:host' %}">Host Session</a>
+    ...
     
     <h3>All games</h3>
     <ol>

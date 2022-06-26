@@ -7,51 +7,89 @@
 
 {% block script %}
     <script src="{% static "edit.js" %}" type="module"></script>
+    <link href="{% static 'livequiz/edit.css' %}" rel="stylesheet">
 {% endblock script %}
 
 {% block body %}
-    <h1>EDIT PAGE TODO</h1>
+    <div class="container">
+        <section class="h3 pl-2 pt-2">
+            <span class="p-1"><u>Game Information</u></span>
+        </section>
+        <table class="h5" style="width: 100%;">
+            <colgroup>
+                <col span="1" style="width: 30%;">
+                <col span="1">
+            </colgroup>
+            <tr>
+                <td>Game Title</td>
+                <td>: {{ game.title }}</td>
+            </tr>
+            <tr>
+                <td>Game ID</td>
+                <td>: {{ game.id }}</td>
+            </tr>
+            <tr>
+                <td>Date Created</td>
+                <td>: {{ game.date_created }}</td>
+            </tr>
+            <tr>
+                <td>Creator</td>
+                <td>: {{ game.creator.username }}</td>
+            </tr>
+        </table><hr>
 
-    <a href="{% url 'livequiz:index' %}">back to home</a>
-    
-
-    {% for question in questions.all %}
-        <div class="questiondiv" data-quesid={{ question.id }}>
-            <h3>Q{{ forloop.counter }}.</h3>
-            <section class="questioneditable">
-                <span class="ques_text">Question:</span>
-                <span class="ques">{{ question.question }}</span><br>
-                <span class="opt1_text">Option 1:</span>
-                <span class="opt1">{{ question.choice1 }}</span><br>
-                <span class="opt2_text">Option 2:</span>
-                <span class="opt2">{{ question.choice2 }}</span><br>
-                <span class="opt3_text">Option 3:</span>
-                <span class="opt3">{{ question.choice3 }}</span><br>
-                <span class="opt4_text">Option 4:</span>
-                <span class="opt4">{{ question.choice4 }}</span><br>
-                <span class="ans_text">Ans: </span>
-                <span class="ans">{{ question.answer }}</span><br>
-                {% if request.user == game.creator %}
-                    <button class="editbutton" data-quesid={{ question.id }}>
-                        Edit
-                    </button>
-                {% endif %}
+        {% if request.user != game.creator %}
+            <section class="alert alert-warning">
+                Note: You can only view the page as you are not the creator!
             </section>
-            {% if request.user == game.creator %}
-                <button class="deletebutton" value={{ question.id }}>Delete</button>
-            {% endif %}
-        </div>
-    {% empty %}
-        No questions created yet!
-    {% endfor %}<br>
-    
-    {% if request.user == game.creator %}
-        <form action="{% url 'livequiz:edit' game_id=game.id %}" method="POST">
-            {% csrf_token %}
-            {{ form.ques_count.label_tag }}
-            {{ form.ques_count }}
-            <button type="submit">Add</button>
-        </form>
-    {% endif %}
-    
+        {% endif %}
+        
+        {% include 'livequiz/pagination.html' %}
+        <section class="text-center">
+            <form action="{% url 'livequiz:edit' game_id=game.id %}?qperpage=4" method="GET">
+                <label for="qperpage">Question per page: </label>
+                <input type="number" min="1" max="20" id="qperpage" value={{ qperpage }} name="qperpage">
+                <input type="submit" value="Change">
+            </form>
+        </section>
+
+        {% for question in questions %}
+            <div class="questiondiv" data-quesid={{ question.id }}>
+                <h3>Q{{ question.count }}.</h3>
+                <section class="questioneditable">
+                    <span class="ques_text">Question:</span>
+                    <span class="ques">{{ question.question }}</span><br>
+                    <span class="opt1_text">Option 1:</span>
+                    <span class="opt1">{{ question.choice1 }}</span><br>
+                    <span class="opt2_text">Option 2:</span>
+                    <span class="opt2">{{ question.choice2 }}</span><br>
+                    <span class="opt3_text">Option 3:</span>
+                    <span class="opt3">{{ question.choice3 }}</span><br>
+                    <span class="opt4_text">Option 4:</span>
+                    <span class="opt4">{{ question.choice4 }}</span><br>
+                    <span class="ans_text">Ans: </span>
+                    <span class="ans">{{ question.answer }}</span><br>
+                    {% if request.user == game.creator %}
+                        <button class="editbutton" data-quesid={{ question.id }}>
+                            Edit
+                        </button>
+                    {% endif %}
+                </section>
+                {% if request.user == game.creator %}
+                    <button class="deletebutton" value={{ question.id }}>Delete</button>
+                {% endif %}
+            </div>
+        {% empty %}
+            No questions created yet!
+        {% endfor %}<br>
+        
+        {% if request.user == game.creator %}
+            <form action="{% url 'livequiz:edit' game_id=game.id %}" method="POST">
+                {% csrf_token %}
+                {{ form.ques_count.label_tag }}
+                {{ form.ques_count }}
+                <button type="submit">Add</button>
+            </form>
+        {% endif %}
+    </div>
 {% endblock body %}

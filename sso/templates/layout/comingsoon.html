@@ -1,0 +1,23 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    Coming Soon
+{% endblock title %}
+
+{% block script %}
+    <link href="{% static 'sso/bg_comingsoon.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock script %}
+
+{% block body %}
+    <p class="text-center display-1">
+        <b>Coming Soon...</b>
+    </p>
+    <section class="h4 text-center">
+        This feature is currently under construction &#128513
+    </section>
+    <script>
+        // TODO
+    </script>
+{% endblock body %}
