@@ -1,0 +1,25 @@
+<div>
+    <section class="h4">
+        <u>{{ info.serialize.title }}</u>
+    </section>
+    <section class="font-weight-normal text-muted pb-2">
+        {{ info.serialize.description }}
+    </section>
+    <section class="ml-2">
+        Written by:
+        <span class="font-weight-bold">
+            {{ info.serialize.creator }}
+        </span>
+    </section>
+    <section class="ml-2 mb-2">
+        Published at:
+        <span class="font-weight-normal">
+            {{ info.serialize.time }}
+        </span>
+    </section>
+    <section class="ml-2">
+        <a href="{% url 'news:render' id=info.serialize.id %}">
+            <button class="btn btn-success">Read More</button>
+        </a>
+    </section>
+</div>

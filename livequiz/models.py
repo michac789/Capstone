@@ -88,13 +88,6 @@ class QuestionType1(QuestionTemplate):
     CHOICES = [("1", choice1), ("2", choice2), ("3", choice3), ("4", choice4)]
     answer = models.CharField(max_length=1, choices=CHOICES, default="1")
     
-    def __eq__(self, other):
-        if (self.choice1 == other.choice1 and self.choice2 == other.choice2 and
-            self.choice3 == other.choice3 and self.choice3 == other.choice3 and
-            self.question == other.question and self.answer == other.answer):
-                return True
-        else: return False
-    
     def serialize(self):
         return {
             "question": self.question,

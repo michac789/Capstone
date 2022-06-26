@@ -1,0 +1,25 @@
+.wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.wrap > div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 10px;
+    padding: 10px;
+    background-color: aliceblue;
+    width: 300px;
+    height: 120px;
+    border: 1px solid black;
+}
+
+.wrap > div > section {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.inl {
+    display: inline;
+}

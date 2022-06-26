@@ -1,0 +1,41 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    News {{ md.id }}
+{% endblock title %}
+
+{% block script %}
+    <link href="{% static 'news/styles.css' %}" rel="stylesheet">
+{% endblock script %}
+
+{% block body %}
+    <div class="container">
+        <section class="display-4">
+            <b>{{ md.title }}</b>
+        </section>
+        <section class="font-weight-normal">
+            Created by: <span><b>{{ md.creator }}</b></span>
+        </section>
+        <section class="font-weight-normal mb-2">
+            Created at: <span>{{ md.time }}</span>
+        </section>
+        <a href="{% url 'news:index' %}" class="m-2">
+            <button class="btn btn-outline-dark">
+                Back
+            </button>
+        </a>
+        <hr class="hrmain">
+
+        {% if admin %}
+            <section class="h5">
+                Admin control here (coming soon)
+            </section>
+            <hr class="hrmain">
+        {% endif %}
+
+        <div class="p-1">
+            {{ md.markdown|safe }}
+        </div>
+    </div>
+{% endblock body %}

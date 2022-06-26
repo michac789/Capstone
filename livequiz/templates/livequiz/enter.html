@@ -1,21 +1,58 @@
 {% extends 'layout/root.html' %}
+{% load static %}
 
 {% block title %}
     Enter Code
 {% endblock title %}
 
-{% block script %}{% endblock script %}
+{% block script %}
+    <link href="{% static 'bgcss/bg_entercode.css' %}" rel="stylesheet">
+    <link href="{% static 'livequiz/entercode.css' %}" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% endblock script %}
 
 {% block body %}
-    <h1>ENTER CODE PAGE TODOO</h1>
+    <div class="container p-3 pb-5">
+        <section class="h1 display-1 text-center">
+            <span class="glow">
+                Enter Code Here
+            </span>
+        </section>
+    </div>
 
-    <a href="{% url 'livequiz:index' %}">back to home</a>
-    
     <form action={% url 'livequiz:entercode' %} method="POST">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit" value="Play">
+        <div class="entercodediv">
+            {% csrf_token %}
+            <span class="input">
+                {{ form.sessioncode }}
+                <span></span> 
+            </span>
+        </div>
+        {% if error %}
+            <div class="h2 text-center p-2 brightcol">
+                {{ error }}
+            </div>
+        {% endif %}
+        <div class="centerdiv pt-3 pb-2 entrance">
+            <button class="button" type="submit">
+                <span>
+                    Play
+                </span>
+            </button>
+        </div>
     </form>
-    {{ error }}
 
+    <div class="centerdiv entrance">
+        <a href="{% url 'livequiz:index' %}">
+            <button class="button"><span>Home</span></button>
+        </a>
+    </div>
+
+    <script>
+        $(document).ready(() => {
+            console.log("ready")
+            $(".brightcol").hide(0).slideDown(1000).delay(1000).slideUp(500).slideDown(1500)
+            $(".entrance").hide(0).show(1000)
+        })
+    </script>
 {% endblock body %}

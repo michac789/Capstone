@@ -1,20 +1,104 @@
 {% extends 'layout/root.html' %}
+{% load static %}
 
 {% block title %}
     Create Game
 {% endblock title %}
 
-{% block script %}{% endblock script %}
+{% block script %}
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <link href="{% static 'livequiz/create.css' %}" rel="stylesheet">
+{% endblock script %}
 
 {% block body %}
-    <h1>CREATE PAGE TODO</h1>
+    <div class="container">
+        <section class="h2 pl-2 pt-2">
+            <i class="fa fa-plus-circle fa-fw"></i>
+            <span class="p-1">Create</span>
+        </section>
+        <section class="font-weight-normal">
+            Create, view, edit, and host your own games here!
+        </section><hr>
 
-    <a href="{% url 'livequiz:index' %}">back to home</a>
-
-    <form action="{% url 'livequiz:create' %}" method="POST">
-        {% csrf_token %}
-        {{ form }}
-        <input type="submit"></input>
-    </form>
-
+        {% if anonymous %}
+            <section class="alert alert-danger">
+                Please kindly log in to access all these features:<br>
+                &bull; Create and edit your own game<br>
+                &bull; View your own games and bookmark other games<br>
+                &bull; Host a game session with your own / other games<br>
+            </section>
+        {% else %}
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h4 class="mb-0 h4">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    <i class="fa fa-plus-square-o" style="font-size:24px">
+                                        Create New Game
+                                    </i>
+                                </button>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <form action="{% url 'livequiz:create' %}" method="POST">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        {{ form.title.label_tag }}
+                                        {{ form.title }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ form.description.label_tag }}
+                                        {{ form.description }}
+                                    </div>
+                                    <input type="submit" value="Create" class="btn btn-outline-dark"></input>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div><hr>
+                
+                <div>
+                    <section class="h4">
+                        <span class="p-1">
+                            <u>My Games</u>
+                        </span>
+                    </section>
+        
+                    <div class="wrap">
+                        {% for game in mygames %}
+                            <div class="gamediv">
+                                <section class="h5">
+                                    <wrap>{{ game.title }}</wrap>
+                                </section>
+                                <section class="font-weight-normal">
+                                    Creator: <b>{{ game.creator.username }}</b>
+                                </section>
+                                <section class="text-center">
+                                    <a href="{% url 'livequiz:edit' game_id=game.id %}">
+                                        <button class="btn btn-warning m-2 px-3">
+                                            View
+                                        </button>
+                                    </a>
+                                    <form action="{% url 'livequiz:host' game_id=game.id %}" class="inl" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-info m-2 px-3">
+                                            Host
+                                        </button>
+                                    </form>
+                                </section>
+                            </div>
+                        {% empty %}
+                            You have not created any games yet.
+                        {% endfor %}
+                    </div>
+                </div><hr>
+        
+                <div>
+                    Bookmarked games - TODO
+                </div>
+            </div>
+        {% endif %}
 {% endblock body %}

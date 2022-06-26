@@ -1,0 +1,25 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    Logout Page
+{% endblock title %}
+
+{% block script %}
+    <link href="{% static 'sso/bg_sso.css' %}" rel="stylesheet">
+{% endblock script %}
+
+{% block body %}
+    <div class="alert alert-success ssoform">
+        You have been logged out successfully!
+    </div>
+
+    <div class="ssoform">
+        <a href="{% url 'sso:login' %}">
+            Click here to login with another account
+        </a><br>
+        <a href="{% url 'sso:register' %}">
+            Click here to register a new account
+        </a>
+    </div>
+{% endblock body %}

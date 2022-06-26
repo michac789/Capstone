@@ -1,0 +1,56 @@
+.test {
+    background-color: red;
+}
+
+.bgsso {
+    background-color: rgb(242, 234, 224);
+}
+
+.bgsidebar {
+    background-color: #2259bf;
+}
+
+@media (min-width: 1000px) {
+    .ssoform {
+        margin-left: 20%;
+        margin-right: 20%;
+        margin-top: 3%
+    }
+}
+
+@media (max-width: 999px) {
+    .ssoform {
+        margin-left: 5%;
+        margin-right: 5%;
+        margin-top: 2%
+    }
+}
+
+.capstonetitle {
+    font-size: x-large;
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: rgb(96, 216, 218);
+    text-decoration: underline;
+}
+
+.largefont {
+    font-size: 30px;
+}
+
+.superlargefont {
+    font-size: 40px;
+}
+
+.btm-pos {
+    position: absolute;
+    top: 85vh;
+}
+
+.colwh {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.colwh:hover {
+    color: rgba(255, 255, 255, 0.8);
+}
