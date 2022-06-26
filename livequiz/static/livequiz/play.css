@@ -1,0 +1,21 @@
+.options {
+    width: 98%;
+    margin: 1%;
+    padding: 1%;
+    font-size: 25px;
+}
+
+.options:hover {
+    color: green;
+}
+
+.wrap {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.wrap > .namediv {
+    margin: 10px;
+    width: 150px;
+    height: 20px;
+}

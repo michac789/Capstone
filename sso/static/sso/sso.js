@@ -30,7 +30,6 @@ const capstonetitle = (arg) => {
 }
 
 const adjust_title = () => {
-    console.log(window.innerWidth)
     if (window.innerWidth <= 769) {
         document.querySelector("#capstonetitle").innerHTML = ""
     } else if (window.innerWidth <= 999) {

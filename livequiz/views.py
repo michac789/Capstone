@@ -161,6 +161,35 @@ def playGame(request, game_code):
         "players": UserSession.objects.filter(gamesession = gamesession), # temporary
         "active": "entercode"
     })
+    
+    
+@login_required(login_url="sso:login")
+def result(request, game_code):
+    # make sure game_code is valid
+    try: gamesession = GameSession.objects.get(code=game_code)
+    except KeyError:
+        return HttpResponseBadRequest("Bad request: missing game session code!")
+    except GameSession.DoesNotExist:
+        return HttpResponseBadRequest("Bad Request: invalid game session code!")
+    
+    # tally all scores
+    usersessions = UserSession.objects.filter(gamesession = gamesession)
+    for usersession in usersessions:
+        score = 0
+        answers = AnswerPairType1.objects.filter(usersession = usersession)
+        for answer in answers:
+            if answer.answer == answer.question.answer:
+                score += 1
+        usersession.updatescore(score)
+        
+    print(type(AnswerPairType1.objects.filter(usersession = usersession)))
+    print(AnswerPairType1.objects.filter(usersession = usersession)[0])
+        
+    # render page
+    return render(request, "livequiz/result.html", {
+        "scores": UserSession.objects.filter(gamesession=gamesession).exclude(player=gamesession.host).order_by("-score"),
+        "game": gamesession.game,
+    })
 
 
 @csrf_exempt
@@ -201,19 +230,36 @@ def retrieveGame(request, game_code):
         curr_ques_no = gamesession.current_question
         a = loads(request.body)["answer"]
         q = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
-        usersession = UserSession.objects.get(player = request.user,
-                                              gamesession = gamesession)
-        answer_pair = AnswerPairType1.objects.filter(question = q, usersession = usersession)
+        usersession = UserSession.objects.get(player = request.user, gamesession = gamesession)
+        answer_pair = AnswerPairType1.objects.filter(question = q, usersession = usersession,)
         if answer_pair.count() != 0:
             return JsonResponse({
                 "message": "submitted previosly",
-                "answer": answer_pair.answer
+                "answer": answer_pair[0].answer
             })
         ans = AnswerPairType1(answer = a, question = q, usersession = usersession)
         ans.save()
         return JsonResponse({
             "message": "submitted",
             "answer": a,
+        })
+    
+    # see correct answer and what have you answered
+    elif request.method == "FETCH":
+        question_ids = gamesession.game.get_questiontype1_order()
+        curr_ques_no = gamesession.current_question
+        q = QuestionType1.objects.get(id=question_ids[curr_ques_no - 1])
+        usersession = UserSession.objects.get(player = request.user, gamesession = gamesession)
+        try:
+            answer_pair = AnswerPairType1.objects.get(question = q, usersession = usersession)
+        except AnswerPairType1.DoesNotExist:
+            return JsonResponse({
+                "message": "success", "your_answer": "0",
+                "correct_answer": q.answer,     
+            })
+        return JsonResponse({
+            "message": "success", "your_answer": answer_pair.answer,
+            "correct_answer": q.answer,
         })
 
 

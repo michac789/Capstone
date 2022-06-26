@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Game, GameSession, QuestionType1, AnswerPairType1
+from .models import Game, GameSession, QuestionType1, AnswerPairType1, UserSession
 
 # Register your models here.
 class GameAdmin(admin.ModelAdmin):
@@ -7,9 +7,13 @@ class GameAdmin(admin.ModelAdmin):
     
 class GameSessionAdmin(admin.ModelAdmin):
     list_display = ("__str__", "code", "active", "current_question", "stillopen")
+    
+class UserSessionAdmin(admin.ModelAdmin):
+    list_display = ("id", "__str__")
 
 
 admin.site.register(Game, GameAdmin)
 admin.site.register(GameSession, GameSessionAdmin)
 admin.site.register(QuestionType1)
 admin.site.register(AnswerPairType1)
+admin.site.register(UserSession, UserSessionAdmin)

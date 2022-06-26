@@ -1,0 +1,29 @@
+{% extends 'layout/root.html' %}
+{% load static %}
+
+{% block title %}
+    Result {{ game.code }}
+{% endblock title %}
+
+{% block script %}
+
+{% endblock script %}
+
+{% block body %}
+    <div class="container">
+        <section class="h4">Result Page</section>
+        <hr>
+
+        <section class="alert alert-info">
+            Results of this session is ordered from highest to lowest.
+            The maximum amount of points is {{ game.}}
+        </section>
+        
+        {% for score in scores %}
+            <div class="border border-primary p-3 m-3">
+                Player: {{ score.player.username }}<br>
+                Score: {{ score.score }}<br>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock body %}
