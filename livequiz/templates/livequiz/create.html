@@ -82,11 +82,12 @@
                                             View
                                         </button>
                                     </a>
-                                    <a href="#">
-                                        <button class="btn btn-info m-2 px-3">
+                                    <form action="{% url 'livequiz:host' game_id=game.id %}" class="inl" method="POST">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-info m-2 px-3">
                                             Host
                                         </button>
-                                    </a>
+                                    </form>
                                 </section>
                             </div>
                         {% empty %}

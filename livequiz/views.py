@@ -1,4 +1,4 @@
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, HttpResponseRedirect, Http404, HttpResponseBadRequest
 from django.core import serializers
 from django.shortcuts import render
 from django.urls import reverse
@@ -101,26 +101,18 @@ def editGame(request, game_id):
 
 
 @login_required(login_url="sso:login")
-def hostGame(request):
+def hostGame(request, game_id):
     # 'POST' method: creates new game session if game_id is an integer and valid, redirect to play page
     if request.method == "POST":
-        try: game_id = int(request.POST["game_id"])
-        except TypeError: return render(request, "livequiz/host.html", {
-                "message": "Game ID must be an integer!"
-            })
-        game_id = int(request.POST["game_id"])
         if game_id not in list(Game.objects.all().values_list('id', flat = True)):
-            return render(request, "livequiz/host.html", {
-                "message": "Invalid Game ID!", "active": "create",
-            })
+            return Http404("Game ID not found!")
         game_session = GameSession.objects.create(host = request.user,
                                    game = Game.objects.get(id = game_id))
         return HttpResponseRedirect(reverse("livequiz:play", kwargs = {
             "game_code": game_session.code,
         }))
-
-    # 'GET' method: renders the host html page
-    return render(request, "livequiz/host.html", { "active": "create",})
+    else:
+        return HttpResponseForbidden("This route only supports 'POST' method!")
 
 
 @login_required(login_url="sso:login")
