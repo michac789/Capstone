@@ -7,7 +7,7 @@ from .models import User
 
 
 # Create your tests here.
-class SSOViews(TestCase):
+class SSOTesting(TestCase):
     
     # create mock user
     def setUp(self):
