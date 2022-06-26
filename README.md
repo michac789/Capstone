@@ -25,5 +25,13 @@ pip install -r requirements.txt
 ```
 
 ```python
+python manage.py makemigrations
+```
+
+```python
+python manage.py migrate
+```
+
+```python
 python manage.py runserver
 ```
