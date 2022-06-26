@@ -58,13 +58,13 @@ def register(request):
             })
             
         # ensure password is not too simple
-        try:
-            validate_password(password)
-        except ValidationError:
-            return render(request, "sso/register.html", {
-                "message": "Warning! Your password is too simple, pick another password!",
-                "username": username, "email": email,
-            })
+        # try:
+        #     validate_password(password)
+        # except ValidationError:
+        #     return render(request, "sso/register.html", {
+        #         "message": "Warning! Your password is too simple, pick another password!",
+        #         "username": username, "email": email,
+        #     })
             
         # ensure username is unique (not taken already)
         try:
