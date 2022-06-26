@@ -6,6 +6,7 @@
 
 """
 <a href="https://www.freepik.com/photos/white-studio">White studio photo created by benzoix - www.freepik.com</a>
-
+Django==4.0.4
+markdown2==2.4.3
 
 """
