@@ -1,5 +1,8 @@
 # Capstone
 
+This is my final project on CS50 Web Development using Python & Javascript, created entirely from scratch.
+This project will still require some minor improvements and more feature addition soon :D
+
 ## Distinctiveness and Complexity
 
 This project is mainly a live quiz website where creators can create a game with multiple questions, then challenge multiple people by entering a code to enter a game session and compete with other people live. For now, the question is only of a multiple choice (4 options) type, where the administrator has control to start a game session, close a question or move on to the next question. The players will then be able to answer the question before it is closed. Most of the interaction here happens asynchronously with JavaScript and backend API routes, so the user does not have to refresh the page every time.
