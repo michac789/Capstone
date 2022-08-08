@@ -1,6 +1,6 @@
 # Capstone
 
-This is my final project on CS50 Web Development using Python & Javascript, created entirely from scratch.
+This is my final project on the course CS50 Web Development using Python & Javascript, created entirely from scratch.
 This project will still require some minor improvements and more feature addition soon :D
 
 ## Distinctiveness and Complexity
